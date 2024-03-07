@@ -31,20 +31,12 @@ General remarks:
 ----------------
 - ...
 
-Implemented BONUS tasks:
-------------------------
-- ...
-
 
 -------------------
 Remarks for Task 2:
 -------------------
 General remarks:
 ----------------
-- ...
-
-Implemented BONUS tasks:
-------------------------
 - ...
 
 
@@ -55,6 +47,4 @@ General remarks:
 ----------------
 - ...
 
-Implemented BONUS tasks:
-------------------------
-- ...
+
