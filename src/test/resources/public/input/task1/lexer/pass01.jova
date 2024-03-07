@@ -1,0 +1,6 @@
+LexerFail {
+  int foo() {
+    // S1&sb;
+    // S|1sb;
+  }
+}

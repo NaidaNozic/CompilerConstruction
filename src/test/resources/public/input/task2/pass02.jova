@@ -1,0 +1,12 @@
+Krusty {
+  int krab() {
+    int i;
+    string s;
+    i = print(42);
+    i = print(true);
+    i = print("Wumbo!");
+    i = readInt();
+    s = readLine();
+    return i;
+  }
+}

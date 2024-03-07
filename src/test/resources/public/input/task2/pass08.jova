@@ -1,0 +1,32 @@
+B : A {
+  string foo() {
+    return "foo";
+  }
+
+  int test() {
+    string s;
+    s = foo();
+    return 0;
+  }
+}
+
+A {
+  int foo() {
+    return 42;
+  }
+}
+
+Main {
+  int main() {
+    int i;
+    string s;
+    A a;
+    B b;
+
+    b = new B;
+    s = b.foo();
+    a = b;
+    i = a.foo();
+    return 0;
+  }
+}

@@ -1,0 +1,6 @@
+Student:
+Name: SpongeBob
+Matr.Num.: 50191
+Employee:
+Name: Squidward
+Office: The Krusty Krab

@@ -1,0 +1,18 @@
+MMan {
+  int main() {
+    int i;
+    bool wumbo;
+    
+    print("Set it to W for WUMBO!\n");
+    wumbo = true;
+
+    if(wumbo) {
+      print("MAGNIFY!\n");
+      i = 4;
+    } else {
+      print("EEEVILLL!!!\n");
+      i = 2;
+    }
+    return 0;
+  }
+}

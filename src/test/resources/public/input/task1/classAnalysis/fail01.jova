@@ -1,0 +1,4 @@
+Krusty { 
+  int krab; 
+  string krab;
+}

@@ -1,0 +1,32 @@
+Krusty: Krab {
+  int dosh;
+  int cookFries() {
+    return 1;
+  }
+}
+
+Krab {
+  string krabby_patty;
+  int cookBurger(bool pickels) {
+    return 41;
+  }
+}
+
+Order {
+  int main() {
+    Krusty krust;
+    int i; string s;
+
+    i = krust.dosh;
+    i = krust.cookFries();
+    s = krust.krabby_patty;
+    i = krust.cookBurger(true);
+
+    Krab kraby;
+    kraby = krust;
+    kraby.krabby_patty = "secret";
+    i = kraby.cookBurger(false);
+
+    return 0;
+  }
+}

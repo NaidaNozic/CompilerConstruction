@@ -1,0 +1,5 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 1
+  1:7 - extraneous input 'Fail' expecting {':', '{'}
+

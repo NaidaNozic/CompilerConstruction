@@ -1,0 +1,14 @@
+Krusty {
+  int krab() {
+    int b;
+    Pizza pizza;
+    b = pizza.pineapple;
+    return 0;
+  }
+}
+
+Pizza {
+  bool tomato_sauce;
+  bool mozzarella;
+  bool basil;
+}

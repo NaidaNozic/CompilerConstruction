@@ -1,0 +1,4 @@
+DeclarationTest {
+    bool a;
+    int b, c, d;
+}

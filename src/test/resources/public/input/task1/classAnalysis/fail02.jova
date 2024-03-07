@@ -1,0 +1,7 @@
+Krusty { 
+  string krab;
+}
+
+Krusty {
+  int fish;
+}

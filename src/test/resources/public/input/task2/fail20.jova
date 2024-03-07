@@ -1,0 +1,5 @@
+Krusty {
+  int cookBurger() {
+    return "Krabby Patty";
+  } 
+}

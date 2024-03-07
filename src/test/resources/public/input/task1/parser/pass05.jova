@@ -1,0 +1,9 @@
+IfTest01 {
+  int foo() {
+    if(magnify) {
+      wumbo;
+    } else {
+      mini;
+    }
+  }
+}

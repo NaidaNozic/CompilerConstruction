@@ -1,0 +1,7 @@
+Krusty {
+  int cookFood() {
+    bool fries;
+    fries = 0 != 12 + 1 * 3 / 5 % 0;
+    return 0;
+  }
+}

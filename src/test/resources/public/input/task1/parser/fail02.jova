@@ -1,0 +1,4 @@
+Fail02 Fail {
+  int foo() {
+  }
+}

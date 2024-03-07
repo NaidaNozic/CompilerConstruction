@@ -1,0 +1,14 @@
+Krusty {
+  int krab() {
+    int c;
+    DrPeterLankton plankton;
+    c = plankton.getFormular();
+    return 0;
+  }
+}
+
+DrPeterLankton {
+  bool mindControl() {
+    return true;
+  }
+}

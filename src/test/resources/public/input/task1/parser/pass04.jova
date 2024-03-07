@@ -1,0 +1,11 @@
+ClassTest4 {
+  string bar() {
+    return "abc";
+  }
+}
+
+InherTest : ClassTest4 {
+  bool fooBar() {
+    return true;
+  }
+}

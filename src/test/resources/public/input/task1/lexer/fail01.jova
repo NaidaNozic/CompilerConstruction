@@ -1,0 +1,5 @@
+LexerFail {
+  int foo() {
+    _adf;
+  }
+}

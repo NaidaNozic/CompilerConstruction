@@ -1,0 +1,6 @@
+Krusty { 
+  int cookPizza() {
+    undefMethod();
+    return 0;
+  }
+}

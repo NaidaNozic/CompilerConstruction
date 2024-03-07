@@ -1,0 +1,7 @@
+NotTest {
+    bool a, b;
+    bool test() {
+        a = !!b;
+        return !a;
+    }
+}

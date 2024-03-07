@@ -1,0 +1,5 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 1
+  2:8 - no viable alternative at input 'int,'
+

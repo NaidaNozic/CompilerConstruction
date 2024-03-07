@@ -1,0 +1,5 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 1
+  3:10 - mismatched input ';' expecting {'(', 'nix', 'this', 'new', BOOL, ID, INT, ADDOP, '!', STRING}
+

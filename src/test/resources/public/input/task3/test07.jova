@@ -1,0 +1,36 @@
+Hide {
+  int main() {
+    Node n;
+    HiddenStrNode hn;
+    n = new Node;
+    hn = new HiddenStrNode;
+
+    print(n.setup());
+    print(n.value);
+    print(hn.setup());
+    print(hn.value);
+
+    n = hn;
+
+    print(n.setup());
+    print(n.value);
+
+    return 0;
+  }
+}
+
+Node {
+  int value;
+  int setup() {
+    value = 42;
+    return 3;
+  }
+}
+
+HiddenStrNode : Node {
+  string value;
+  string setup() {
+    value = "world";
+    return "hello";
+  }
+}

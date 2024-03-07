@@ -1,0 +1,13 @@
+Squid {
+  int main() {
+    int i;
+    i = 10;
+
+    while(i > 0) {
+      print("Have you finished those errands?\n");
+      i = i - 1;
+    }
+
+    return 0;
+  }
+}

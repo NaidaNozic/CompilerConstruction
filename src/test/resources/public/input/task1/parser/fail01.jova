@@ -1,0 +1,4 @@
+class Fail01 {
+  int foo() {
+  }
+}

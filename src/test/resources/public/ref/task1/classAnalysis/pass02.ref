@@ -1,0 +1,9 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 0
+
+Number of Semantic Errors: 0
+
+Number of Warnings: 1
+  3:6 - Method 'cookBurger(string)' overrides method of superclass.
+

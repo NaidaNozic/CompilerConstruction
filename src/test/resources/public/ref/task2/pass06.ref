@@ -1,0 +1,10 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 0
+
+Number of Semantic Errors: 0
+
+Number of Warnings: 2
+  12:6 - Method 'printInfo()' overrides method of superclass.
+  22:6 - Method 'printInfo()' overrides method of superclass.
+

@@ -1,0 +1,11 @@
+Krusty {
+  int krab() {
+    int res;
+    if(1 == "hello") {
+      res = 1;
+    } else {
+      res = 0;
+    }
+    return res;
+  }
+}

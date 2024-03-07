@@ -1,0 +1,5 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 1
+  2:2 - mismatched input 'foo' expecting {'}', 'int', 'bool', 'string', CLASS_ID}
+

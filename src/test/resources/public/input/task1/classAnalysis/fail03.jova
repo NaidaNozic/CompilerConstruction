@@ -1,0 +1,5 @@
+Krusty {
+  UndefBurger cookBurger () {
+    return nix;
+  }
+}

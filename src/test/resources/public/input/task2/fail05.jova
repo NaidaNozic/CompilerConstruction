@@ -1,0 +1,8 @@
+Krusty {
+  int cookBurger() {
+    int a;
+    41;
+    a = 42;
+    return 0;
+  }
+}

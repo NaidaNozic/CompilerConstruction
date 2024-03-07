@@ -1,0 +1,17 @@
+DrPeterLankton {
+  int stealSecret() {
+    Secret s;
+    s = new Secret;
+    if(s == nix) {
+      print("ARRRRGGGHH!");
+    } else {
+      print("YEEEEESSSSS!");
+    }
+    s = nix;
+    return -1;
+  }
+}
+
+Secret {
+  string secret;
+}

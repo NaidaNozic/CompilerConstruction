@@ -1,0 +1,50 @@
+Person {
+  string name;
+  int printInfo() {
+    print("Person:\n");
+    print("Name: ") + print(name) + print("\n");
+    return 0;
+  }
+}
+
+Student : Person {
+  int matr_num;
+  int printInfo() {
+    print("Student:\n");
+    print("Name: ") + print(name) + print("\n");
+    print("Matr.Num.: ") + print(matr_num) + print("\n");
+    return 0;
+  }
+}
+
+Employee : Person {
+  string office;
+  int printInfo() {
+    print("Employee:\n");
+    print("Name: ") + print(name) + print("\n");
+    print("Office: ") + print(office) + print("\n");
+    return 0;
+  }
+}
+
+Test {
+  int main() {
+    // init new Student
+    Student s;
+    s = new Student;
+    s.name = "SpongeBob";
+    s.matr_num = 50191;
+
+    // init new Employee
+    Employee e;
+    e = new Employee;
+    e.name = "Squidward";
+    e.office = "The Krusty Krab";
+
+    // print info
+    s.printInfo();
+    e.printInfo();
+    return 0;
+  }
+}
+

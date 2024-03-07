@@ -1,0 +1,20 @@
+Lord {
+  VidyaGame game;
+}
+
+VidyaGame {
+  int play() { return 1337; }
+  int fun() { return 1; }
+}
+
+ILoveVidya {
+  int wee() {
+    VidyaGame half_life;
+    Lord gaben;
+
+    half_life = gaben.game;
+    half_life.play();
+    half_life.3;
+    return 0;
+  }
+}

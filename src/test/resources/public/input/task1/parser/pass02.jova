@@ -1,0 +1,10 @@
+ClassTest1 {
+  Return getFoo() {
+    bar;
+    baz;
+    return new Return;
+  }
+}
+
+Return {
+}

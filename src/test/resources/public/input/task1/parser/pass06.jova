@@ -1,0 +1,7 @@
+WhileTest01 {
+  int foo() {
+    while(old) {
+      print("are you feeling it now?");
+    }
+  }
+}
