@@ -21,7 +21,7 @@ KEY_NEW : 'new' ;
 ADDOP : '+' | '-' ;
 ASSIGN : '=' ;
 RELOP : '<' | '>' | '==' | '! =' ;
-MULOP : '∗' | '/' | '%' ;
+MULOP : '*' | '/' | '%' ;
 OR : '||' ;
 AND : '&&' ;
 NOT : '!' ;
