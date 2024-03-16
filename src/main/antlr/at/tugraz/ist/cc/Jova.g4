@@ -54,6 +54,19 @@ fragment UPPERCASE : [A-Z] ;
  if_stmt : KEY_IF '(' expr ')' block (KEY_ELSE block)? ;
  while_stmt : KEY_WHILE '(' expr ')' block ;
  return_stmt : KEY_RETURN expr ';' ;
- expr : literal | id_expr | KEY_NEW CLASS_ID | '(' expr ')' ; // TODO: complete this rule (see Task 1.4)
+
+ expr : literal
+        | id_expr
+        | KEY_NEW CLASS_ID
+        | '(' expr ')'
+        | expr DOT expr
+        | (ADDOP | NOT) expr
+        | expr MULOP expr
+        | expr ADDOP expr
+        | expr RELOP expr
+        | expr AND expr
+        | expr OR expr
+        | expr ASSIGN expr;
+
  id_expr : ID ;//| ID ( TODO: complete this rule (see Task 1.5) )
  literal : INT | BOOL | STRING | KEY_NIX | KEY_THIS ;
