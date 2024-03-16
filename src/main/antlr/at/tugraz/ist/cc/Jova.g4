@@ -68,5 +68,5 @@ fragment UPPERCASE : [A-Z] ;
         | expr OR expr
         | expr ASSIGN expr;
 
- id_expr : ID ;//| ID ( TODO: complete this rule (see Task 1.5) )
+ id_expr : ID ( '(' ( (expr ',')* expr )? ')')? ;
  literal : INT | BOOL | STRING | KEY_NIX | KEY_THIS ;
