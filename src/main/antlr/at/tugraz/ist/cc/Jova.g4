@@ -20,7 +20,7 @@ KEY_NEW : 'new' ;
 //Operators
 ADDOP : '+' | '-' ;
 ASSIGN : '=' ;
-RELOP : '<' | '>' | '==' | '! =' ;
+RELOP : '<' | '>' | '==' | '!=' ;
 MULOP : '*' | '/' | '%' ;
 OR : '||' ;
 AND : '&&' ;
