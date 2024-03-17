@@ -25,8 +25,8 @@ public class Jovac {
      */
     private final List<LexicalError> lexical_errors = new LinkedList<>();
     private final List<SyntaxError> syntax_errors = new LinkedList<>();
-    private final List<SemanticError> semantic_errors = new LinkedList<>();;
-    private final List<JovaWarning> warnings = new LinkedList<>();;
+    private final List<SemanticError> semantic_errors = new LinkedList<>();
+    private final List<JovaWarning> warnings = new LinkedList<>();
 
 
     /**
@@ -41,7 +41,7 @@ public class Jovac {
      */
     public void task1(String file_path) {
         // TODO: Implement Task 1.
-        CharStream input = null;
+        CharStream input;
         try {
             input = CharStreams.fromFileName(file_path);
         }catch(IOException e){
@@ -129,7 +129,7 @@ public class Jovac {
      * <p>TODO: Implement for Task 1.1.</p>
      */
     public Collection<LexicalError> getLexicalErrors() {
-        return null;
+        return lexical_errors;
     }
 
 
@@ -141,7 +141,7 @@ public class Jovac {
      * <p>TODO: Implement for Task 1.1.</p>
      */
     public Collection<SyntaxError> getSyntaxErrors() {
-        return null;
+        return syntax_errors;
     }
 
 
