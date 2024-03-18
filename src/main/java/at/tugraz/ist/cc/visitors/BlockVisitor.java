@@ -4,39 +4,35 @@ import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.ClassBody;
+import at.tugraz.ist.cc.program.Block;
 import at.tugraz.ist.cc.program.Declaration;
 import at.tugraz.ist.cc.program.Param;
-import org.antlr.v4.codegen.model.decl.Decl;
+import at.tugraz.ist.cc.program.WhileStatement;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
+public class BlockVisitor extends JovaBaseVisitor<Block> {
 
     public List<SemanticError> semanticErrors;
-
-    private Set<String> declarationNames = new HashSet<>();
-
-    public ClassBodyVisitor(List<SemanticError> semanticErrors){
-        this.semanticErrors = semanticErrors;
-    }
     @Override
-    public ClassBody visitClass_body(JovaParser.Class_bodyContext ctx) {
-        ClassBody classBody = new ClassBody();
+    public Block visitBlock(JovaParser.BlockContext ctx) {
+        Block block = new Block();
         DeclarationVisitor declarationVisitor = new DeclarationVisitor(semanticErrors);
-        MethodVisitor methodVisitor = new MethodVisitor(semanticErrors);
+        IfStatementVisitor ifStatementVisitor = new IfStatementVisitor(semanticErrors);
+        WhileStatementVisitor whileStatementVisitor = new WhileStatementVisitor(semanticErrors);
+        ReturnStatementVisitor returnStatementVisitor = new ReturnStatementVisitor(semanticErrors);
+        ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
 
-        for (int i=0; i<ctx.getChildCount(); i++){
+        for(int i=0; i<ctx.getChildCount(); i++){
             if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
+
                 Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
-                checkConflicts(declaration, classBody.declarations);
-                classBody.declarations.add(declaration);
+                checkConflicts(declaration, block.declarations);
+                block.declarations.add(declaration);
 
             }
         }
-        return classBody;
+        return block;
     }
     private void checkConflicts(Declaration declaration, List<Declaration> declarations) {
 
@@ -51,5 +47,5 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         }
 
     }
-}
 
+}

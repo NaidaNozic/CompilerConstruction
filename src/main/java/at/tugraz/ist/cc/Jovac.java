@@ -5,7 +5,9 @@ import at.tugraz.ist.cc.error.lexandparse.SyntaxError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.error.warning.JovaWarning;
 import at.tugraz.ist.cc.io.JovaErrorPrinter;
+import at.tugraz.ist.cc.visitors.ProgramVisitor;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -57,7 +59,11 @@ public class Jovac {
         lexer.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
         parser.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
 
-        parser.program();
+        ParseTree parseTree = parser.program();
+
+        if (lexical_errors.size() +syntax_errors.size() == 0){
+            new ProgramVisitor(semantic_errors).visit(parseTree);
+        }
 
         JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, semantic_errors, warnings);
 
@@ -153,7 +159,7 @@ public class Jovac {
      * <p>TODO: Implement for Task 1.2.</p>
      */
     public Collection<SemanticError> getSemanticErrors() {
-        return null;
+        return semantic_errors;
     }
 
 
@@ -165,6 +171,6 @@ public class Jovac {
      * <p>TODO: Implement for Task 1.2.</p>
      */
     public Collection<JovaWarning> getWarnings() {
-        return null;
+        return warnings;
     }
 }
