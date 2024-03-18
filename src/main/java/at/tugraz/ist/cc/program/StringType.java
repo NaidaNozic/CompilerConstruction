@@ -1,7 +1,7 @@
 package at.tugraz.ist.cc.program;
 
 public class StringType extends Type{
-    public StringType(StringLiteral type) {
+    public StringType(String type) {
         super(type);
     }
 }
