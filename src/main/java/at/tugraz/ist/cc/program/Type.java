@@ -2,9 +2,9 @@ package at.tugraz.ist.cc.program;
 
 public abstract class Type {
 
-    public StringLiteral type;
+    public String type;
 
-    public Type(StringLiteral type){
+    public Type(String type){
         this.type = type;
     }
 }

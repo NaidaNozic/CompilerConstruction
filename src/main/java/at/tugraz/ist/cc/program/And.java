@@ -1,7 +1,7 @@
 package at.tugraz.ist.cc.program;
 
 public class And extends Operator{
-    public And(StringLiteral operator) {
+    public And(String operator) {
         super(operator);
     }
 }

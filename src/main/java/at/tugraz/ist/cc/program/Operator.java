@@ -1,8 +1,8 @@
 package at.tugraz.ist.cc.program;
 
 public class Operator {
-    public StringLiteral operator;
-    public Operator(StringLiteral operator) {
+    public String operator;
+    public Operator(String operator) {
         this.operator = operator;
     }
 }
