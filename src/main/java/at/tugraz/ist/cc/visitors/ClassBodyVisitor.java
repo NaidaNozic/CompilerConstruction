@@ -3,15 +3,15 @@ package at.tugraz.ist.cc.visitors;
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
+import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.ClassBody;
 import at.tugraz.ist.cc.program.Declaration;
+import at.tugraz.ist.cc.program.Method;
 import at.tugraz.ist.cc.program.Param;
 import org.antlr.v4.codegen.model.decl.Decl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
 
@@ -35,6 +35,11 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
                 classBody.declarations.add(declaration);
 
             }
+            else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+                Method method = methodVisitor.visit(ctx.getChild(i));
+                checkMethodConflicts(method, classBody.methods);
+                classBody.methods.add(method);
+            }
         }
         return classBody;
     }
@@ -50,6 +55,34 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
             }
         }
 
+    }
+
+    private void checkMethodConflicts(Method method, List<Method> methods){
+        for(Method current_method : methods){
+            if(Objects.equals(method.param.id, current_method.param.id)){
+                if(method.paramList.params.size() == current_method.paramList.params.size()){
+                    boolean all_same = true;
+
+                    for(int it = 0; it < method.paramList.params.size(); it++){
+                        if(!Objects.equals(method.paramList.params.get(it).type.type, current_method.paramList.params.get(it).type.type)){
+                            all_same = false;
+                            break;
+                        }
+                    }
+
+                    if(all_same){
+                        //make String Collection
+                        List<String> param_types = new ArrayList<>();
+
+                        for(Param param : method.paramList.params)
+                        {
+                            param_types.add(param.type.type);
+                        }
+                        semanticErrors.add(new MethodDoubleDefError(method.param.id, param_types, method.param.line));
+                    }
+                }
+            }
+        }
     }
 }
 
