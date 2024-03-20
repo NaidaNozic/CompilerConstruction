@@ -1,5 +1,7 @@
 package at.tugraz.ist.cc.program;
 
+import java.util.ArrayList;
+
 public class Method {
     public Block block;
     public ParamList paramList;

@@ -3,9 +3,10 @@ package at.tugraz.ist.cc.visitors;
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
+import at.tugraz.ist.cc.error.semantic.IDUnknownError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.ClassDeclaration;
-import at.tugraz.ist.cc.program.Program;
+import at.tugraz.ist.cc.program.*;
+import org.antlr.v4.codegen.model.decl.Decl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,6 +36,44 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
         }
 
+        for (ClassDeclaration classDeclaration : program.classDeclarations){
+            if (classDeclaration.classBody == null) return program;
+            List<Declaration> declarations = classDeclaration.classBody.declarations;
+            List<Method> methods = classDeclaration.classBody.methods;
+
+            if (declarations != null)
+                for (Declaration declaration : declarations){
+                    if (!declaration.params.isEmpty())
+                        checkUndefined(declaration.params.getFirst());
+                }
+
+            if (methods != null)
+                for (Method method : methods){
+                    checkUndefined(method.param);
+
+                    if (method.paramList != null)
+                        for (Param param1 : method.paramList.params){
+                            checkUndefined(param1);
+                        }
+
+                    for (Declaration declaration : method.block.declarations){
+                        if (!declaration.params.isEmpty())
+                            checkUndefined(declaration.params.getFirst());
+                    }
+                }
+        }
+
         return program;
+    }
+
+    public void checkUndefined(Param param) {
+        if (param.type instanceof IntegerType
+                || param.type instanceof StringType
+                || param.type instanceof BoolType)
+            return;
+
+        if(!classNames.contains(param.type.type)){
+            semanticErrors.add(new IDUnknownError(param.type.type, param.line));
+        }
     }
 }

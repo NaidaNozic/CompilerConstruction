@@ -3,10 +3,7 @@ package at.tugraz.ist.cc.visitors;
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.BoolType;
-import at.tugraz.ist.cc.program.IntegerType;
-import at.tugraz.ist.cc.program.StringType;
-import at.tugraz.ist.cc.program.Type;
+import at.tugraz.ist.cc.program.*;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ public class TypeVisitor extends JovaBaseVisitor<Type> {
             case "int" -> new IntegerType(typeName);
             case "bool" -> new BoolType(typeName);
             case "string" -> new StringType(typeName);
-            default -> null;
+            default -> new ClassType(typeName);
         };
     }
 }
