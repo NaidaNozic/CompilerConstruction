@@ -30,22 +30,32 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
         BlockVisitor blockVisitor = new BlockVisitor();
 
-        for(int params = 0; params < ctx.getChild(2).getChildCount(); params++){
 
-            if(ctx.getChild(2).getChild(params) instanceof JovaParser.ParamContext){
+        for(int children = 0; children < ctx.getChildCount(); children++)
+        {
+            if(ctx.getChild(children) instanceof JovaParser.Param_listContext){
+                for(int params = 0; params < ctx.getChild(children).getChildCount(); params++){
 
-                Param param = paramVisitor.visit(ctx.getChild(2).getChild(params));
+                    if(ctx.getChild(children).getChild(params) instanceof JovaParser.ParamContext){
 
-                if(double_decl_list.contains(param.id)){
-                    semanticErrors.add(new IDDoubleDeclError(param.id, param.line));
+                        Param param = paramVisitor.visit(ctx.getChild(2).getChild(params));
+
+                        if(double_decl_list.contains(param.id)){
+                            semanticErrors.add(new IDDoubleDeclError(param.id, param.line));
+                        }
+                        double_decl_list.add(param.id);
+
+                        param_list.params.add(param);
+                    }
                 }
-                double_decl_list.add(param.id);
-
-                param_list.params.add(param);
             }
         }
 
 
+    if(param_list.params.isEmpty()){
+        return new Method(blockVisitor.visit(ctx.getChild(3)),
+                          paramVisitor.visit(ctx.getChild(0)));
+    }
 
     return new Method(blockVisitor.visit(ctx.getChild(4)),
                       param_list,
