@@ -6,9 +6,6 @@ import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.IDUnknownError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
-import org.antlr.v4.codegen.model.decl.Decl;
-
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
