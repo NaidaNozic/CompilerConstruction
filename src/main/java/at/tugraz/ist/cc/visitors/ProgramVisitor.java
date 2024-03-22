@@ -48,10 +48,9 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                 for (Method method : methods){
                     checkUndefined(method.param);
 
-                    if (method.paramList != null)
-                        for (Param param1 : method.paramList.params){
-                            checkUndefined(param1);
-                        }
+                    for (Param param1 : method.paramList.params){
+                        checkUndefined(param1);
+                    }
 
                     for (Declaration declaration : method.block.declarations){
                         if (!declaration.params.isEmpty())
