@@ -37,6 +37,7 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
             }
             else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
                 Method method = methodVisitor.visit(ctx.getChild(i));
+                checkBuiltInFunctions(method);
                 checkMethodConflicts(method, classBody.methods);
                 classBody.methods.add(method);
             }
@@ -61,7 +62,7 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         for(Method current_method : methods){
             if(Objects.equals(method.param.id, current_method.param.id)){
                 if(method.paramList.params.size() == current_method.paramList.params.size()){
-                    boolean all_same = true;
+                    boolean all_same = true; //or no parameters passed
 
                     for(int it = 0; it < method.paramList.params.size(); it++){
                         if(!Objects.equals(method.paramList.params.get(it).type.type, current_method.paramList.params.get(it).type.type)){
@@ -84,5 +85,21 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
             }
         }
     }
+
+    private void checkBuiltInFunctions(Method method){
+        if(Objects.equals(method.param.id, "print") && method.paramList.params.size() == 1){
+            String type = method.paramList.params.getFirst().type.type;
+            if(Objects.equals(type, "int") || Objects.equals(type, "bool") || Objects.equals(type, "string"))
+            {
+                semanticErrors.add(new MethodDoubleDefError(method.param.id, Collections.singletonList(type), method.param.line));
+            }
+        }
+        else if((Objects.equals(method.param.id, "readInt") || Objects.equals(method.param.id, "readLine")) &&
+                method.paramList.params.isEmpty()){
+
+                semanticErrors.add(new MethodDoubleDefError(method.param.id, new ArrayList<>(), method.param.line));
+        }
+    }
+
 }
 

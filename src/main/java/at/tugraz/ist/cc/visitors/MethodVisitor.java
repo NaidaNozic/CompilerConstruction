@@ -54,6 +54,7 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
 
     if(param_list.params.isEmpty()){
         return new Method(blockVisitor.visit(ctx.getChild(3)),
+                          param_list,
                           paramVisitor.visit(ctx.getChild(0)));
     }
 
