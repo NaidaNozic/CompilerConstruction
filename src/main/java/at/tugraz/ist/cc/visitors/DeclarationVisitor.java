@@ -31,7 +31,7 @@ public class DeclarationVisitor extends JovaBaseVisitor<Declaration> {
                     declaration.params.add(new Param(param.type, ctx.getChild(i+1).getText(), param.line, 0));
                 }
             }
-
+//example comment
         } else if (ctx.getChild(0) instanceof JovaParser.ExprContext) {
             Expression expression = expressionVisitor.visit(ctx.getChild(0));
             declaration.expressions.add(expression);
