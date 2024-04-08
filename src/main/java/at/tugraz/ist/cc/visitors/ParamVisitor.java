@@ -23,8 +23,8 @@ public class ParamVisitor extends JovaBaseVisitor<Param> {
         Type type = typeVisitor.visit(ctx.getChild(0));
         String id = ctx.getChild(1).getText();
         Integer line=ctx.ID().getSymbol().getLine();
-
-        return new Param(type, id, line);
+        Integer column = ctx.ID().getSymbol().getCharPositionInLine();
+        return new Param(type, id, line, column);
     }
 
 }

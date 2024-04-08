@@ -107,7 +107,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
             if(!meth.paramList.params.get(i).type.type.equals(prev.paramList.params.get(i).type.type)) return;
             errorparams.add(meth.paramList.params.get(i).type.type);
         }
-        jovaWarnings.add(new OverrideWarning(meth.param.id, errorparams, meth.param.line, 3));
+        jovaWarnings.add(new OverrideWarning(meth.param.id, errorparams, meth.param.line, meth.param.column));
         System.out.println("Ista metoda " + meth.param.id);
     }
 
