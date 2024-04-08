@@ -1,0 +1,7 @@
+Krusty {
+  int customers;
+  int main() {
+    print(customers);
+    return 0;
+  }
+}

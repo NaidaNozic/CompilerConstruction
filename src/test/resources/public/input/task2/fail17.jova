@@ -1,0 +1,16 @@
+Krusty {
+  int krab() {
+    ClassA a;
+    ClassB b;
+    a = b;
+    return 0;
+  }
+}
+
+ClassA {
+  int x;
+}
+
+ClassB {
+  int y;
+}

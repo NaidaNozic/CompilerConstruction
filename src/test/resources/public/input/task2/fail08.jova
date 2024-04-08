@@ -1,0 +1,7 @@
+Krusty {
+  int krab() {
+    bool b;
+    b = !"hello";
+    return 0;
+  }
+}

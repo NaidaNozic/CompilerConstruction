@@ -1,0 +1,23 @@
+Main {
+  int main() {
+    Nested nested;
+    nested = new Nested;
+    return nested.nestedIsland();
+  }
+}
+
+Nested {
+  int fortyTwo() {
+    return 42;
+  }
+
+  int nestedIsland() {
+    int foo, ret;
+    foo = 4 + 8 * 15 * (16 - 23) / this.fortyTwo();
+    print("The result of the nested expression is ");
+    ret = print(foo);
+
+    return ret;
+  }
+}
+

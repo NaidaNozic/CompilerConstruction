@@ -1,0 +1,9 @@
+Fail14 {
+    int test1(int a, int b) {
+        return a + b;
+    }
+
+    bool test2() {
+        return test1(, 1, 2) > 0;
+    }
+}

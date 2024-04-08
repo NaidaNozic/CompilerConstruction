@@ -1,0 +1,6 @@
+Fail04 {
+  int Foo() {
+    return foo;
+  }
+}
+

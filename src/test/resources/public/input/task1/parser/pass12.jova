@@ -1,0 +1,5 @@
+AndOrTest {
+    bool test(bool a, bool b, int c) {
+        return a && b || c;
+    }
+}

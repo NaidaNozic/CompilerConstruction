@@ -1,0 +1,14 @@
+Krusty {
+  int cookBurger() {
+    int a;
+    Krab b;
+    a = 4;
+    b.c = 2;
+    1 = 2;
+    return 0;
+  }
+}
+
+Krab {
+  int c;
+}

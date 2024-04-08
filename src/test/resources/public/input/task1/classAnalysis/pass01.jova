@@ -1,0 +1,12 @@
+Krusty {
+  Krab what;
+  int customers;
+  int cookBurger(string name) { return 0; }
+  bool withFries() { return true; }
+}
+
+Krab {
+  string customers;
+  int cookBurger(string bruger_name) { return 1;}
+  string withFries() { return "no fries?!"; }
+}

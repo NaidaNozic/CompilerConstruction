@@ -1,0 +1,19 @@
+ParamListMethodCallTest {
+    int a;
+    int test1() {
+        return a;
+    }
+
+    int test2(int a) {
+        return a + test1();
+    }
+
+    int test3(int a, int b) {
+        return a + test2(test1()) - b;
+    }
+
+    bool test4(int a) {
+        a = test3(test2(a), 1);
+        return a != 0;
+    }
+}

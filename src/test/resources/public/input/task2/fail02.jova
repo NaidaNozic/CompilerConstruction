@@ -1,0 +1,6 @@
+Krusty { 
+  int cookFries() {
+    undefVar = 41;
+    return 0;
+  }
+}

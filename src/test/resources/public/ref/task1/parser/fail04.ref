@@ -1,0 +1,6 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 2
+  2:6 - no viable alternative at input 'intFoo'
+  2:9 - mismatched input '(' expecting {':', '{'}
+

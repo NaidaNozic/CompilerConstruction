@@ -1,0 +1,5 @@
+Krusty {
+  int cookBurger (int patty , string patty) {
+    return 0;
+  }
+}

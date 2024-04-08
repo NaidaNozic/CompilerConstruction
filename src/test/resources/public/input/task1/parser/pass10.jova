@@ -1,0 +1,6 @@
+RelOpEqualNotEqualTest {
+    int test(int a, int b) {
+        bool c;
+        return a == b != c;
+    }
+}

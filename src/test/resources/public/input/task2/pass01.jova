@@ -1,0 +1,9 @@
+Krusty {
+  int krab;
+  string bob() {
+  	string krab;
+    int i;
+    i = this.krab;
+    return krab;
+  }
+}

@@ -1,0 +1,8 @@
+AssignTest {
+    int a;
+    int test(int b) {
+        int c;
+        c = a = b;
+        return c;
+    }
+}

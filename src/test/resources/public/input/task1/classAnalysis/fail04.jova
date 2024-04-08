@@ -1,0 +1,9 @@
+Krusty { 
+  int cookBurger(int patty, bool sauce) {
+    return 0;
+  }
+  
+  bool cookBurger(int patties, bool ketchup) {
+    return true;
+  }
+}

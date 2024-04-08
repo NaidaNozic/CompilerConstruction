@@ -1,0 +1,8 @@
+ClassTest2 {
+  int getFoo() {
+    foo;
+  }
+  int getBar() {
+    return bar;
+  }
+}

@@ -1,0 +1,5 @@
+Fail07 {
+    bool test(int a, int b) {
+        return a b;
+    }
+}

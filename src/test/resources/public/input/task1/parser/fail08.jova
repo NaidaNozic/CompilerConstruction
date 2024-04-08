@@ -1,0 +1,6 @@
+Fail08 {
+    int a;
+    bool test() {
+        return *a;
+    }
+}

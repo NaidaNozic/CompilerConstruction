@@ -1,0 +1,9 @@
+Fail15 {
+    int test1(int a, int b) {
+        return a + b;
+    }
+
+    bool test2(string a) {
+        return test1(a 1, 2) != 0;
+    }
+}

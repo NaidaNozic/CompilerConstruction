@@ -1,0 +1,11 @@
+Krusty {
+  int krab() {
+    bool my_bool;
+    MyClass clazz;
+    my_bool = clazz != 42;
+    return 0;
+  }
+}
+
+MyClass {
+}

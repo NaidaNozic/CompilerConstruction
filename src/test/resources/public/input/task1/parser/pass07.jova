@@ -1,0 +1,6 @@
+AddOpTest {
+    int a, b;
+    int test(int c) {
+        return a + 1 - (b + c);
+    }
+}

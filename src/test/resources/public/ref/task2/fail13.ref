@@ -1,0 +1,9 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 0
+
+Number of Semantic Errors: 2
+  line 5 - 'DrPeterLankton' does not have method 'getFormular()'.
+
+Number of Warnings: 0
+

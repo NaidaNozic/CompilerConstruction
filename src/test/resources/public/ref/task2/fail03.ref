@@ -1,0 +1,9 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 0
+
+Number of Semantic Errors: 1
+  line 3 - Call to unknown method: 'undefMethod()'.
+
+Number of Warnings: 0
+

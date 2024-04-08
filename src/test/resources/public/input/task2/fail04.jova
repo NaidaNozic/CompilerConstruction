@@ -1,0 +1,9 @@
+MermaidMan {
+  int buckle() {
+    bool mini;
+    if(mini) {
+      bool wumbo;
+    }
+    return 0;
+  }
+}

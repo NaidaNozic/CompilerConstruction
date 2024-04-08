@@ -1,0 +1,15 @@
+Test {
+    int a;
+
+    int getA() {
+        return this.a;
+    }
+}
+
+DotTest {
+    int test() {
+        Test test;
+        test = new Test;
+        return test.getA();
+    }
+}

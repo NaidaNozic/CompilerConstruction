@@ -1,0 +1,9 @@
+Number of Lexical Errors: 0
+
+Number of Syntax Errors: 0
+
+Number of Semantic Errors: 1
+  line 3 - Incompatible type for return.
+
+Number of Warnings: 0
+

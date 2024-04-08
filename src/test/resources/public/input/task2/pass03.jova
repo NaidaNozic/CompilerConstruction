@@ -1,0 +1,16 @@
+Krusty: Krab {
+  int prepMenu() {
+    int num_burger;
+    string name;
+    num_burger = cookBurger(false);
+    name = krabby_patty;
+    return 0;
+  }
+}
+
+Krab {
+  string krabby_patty;
+  int cookBurger(bool pickels) {
+    return 0;
+  }
+}

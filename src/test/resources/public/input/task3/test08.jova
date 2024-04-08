@@ -1,0 +1,31 @@
+Ride {
+  int main() {
+    Node n;
+    StrNode sn;
+    n = new Node;
+    sn = new StrNode;
+
+    n.print();
+    sn.print();
+
+    n = sn;
+
+    n.print();
+
+    return 0;
+  }
+}
+
+Node {
+  int print() {
+    print(4);
+    return 0;
+  }
+}
+
+StrNode : Node {
+  int print() {
+    print("2");
+    return 0;
+  }
+}
