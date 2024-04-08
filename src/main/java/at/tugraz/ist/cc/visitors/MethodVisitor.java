@@ -30,7 +30,6 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
         BlockVisitor blockVisitor = new BlockVisitor();
 
-
         for(int children = 0; children < ctx.getChildCount(); children++)
         {
             if(ctx.getChild(children) instanceof JovaParser.Param_listContext){

@@ -61,8 +61,9 @@ public class Jovac {
 
         ParseTree parseTree = parser.program();
 
+
         if (lexical_errors.size() +syntax_errors.size() == 0){
-            new ProgramVisitor(semantic_errors).visit(parseTree);
+            new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
         }
 
         JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, semantic_errors, warnings);
