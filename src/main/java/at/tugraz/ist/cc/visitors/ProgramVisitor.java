@@ -53,6 +53,10 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         }
 
         for (ClassDeclaration classDeclaration : program.classDeclarations){
+
+            if (classDeclaration.superclass != null)
+                checkUndefinedClassId(classDeclaration.superclass,classDeclaration.line);
+
             if (classDeclaration.classBody == null) return program;
             List<Declaration> declarations = classDeclaration.classBody.declarations;
             List<Method> methods = classDeclaration.classBody.methods;
