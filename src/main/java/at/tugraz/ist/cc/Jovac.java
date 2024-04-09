@@ -10,9 +10,8 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * DO NOT CHANGE THE NAME OF THIS CLASS OR MOVE IT TO ANOTHER PACKAGE! You can
@@ -61,12 +60,11 @@ public class Jovac {
 
         ParseTree parseTree = parser.program();
 
-
         if (lexical_errors.size() +syntax_errors.size() == 0){
             new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
         }
 
-        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, semantic_errors, warnings);
+        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
 
     }
 
@@ -160,6 +158,12 @@ public class Jovac {
      * <p>TODO: Implement for Task 1.2.</p>
      */
     public Collection<SemanticError> getSemanticErrors() {
+
+        Comparator<SemanticError> compareByLine = Comparator.comparing( SemanticError::getLine );
+        Comparator<SemanticError> compareByCharPos = Comparator.comparing( SemanticError::getCharPos );
+        Comparator<SemanticError> compareByLineAndCharPos = compareByLine.thenComparing(compareByCharPos);
+        Collections.sort(semantic_errors, compareByLineAndCharPos);
+
         return semantic_errors;
     }
 

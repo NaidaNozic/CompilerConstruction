@@ -4,16 +4,16 @@ import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.Block;
-import at.tugraz.ist.cc.program.Declaration;
-import at.tugraz.ist.cc.program.Param;
-import at.tugraz.ist.cc.program.WhileStatement;
+import at.tugraz.ist.cc.program.*;
 
 import java.util.List;
 
 public class BlockVisitor extends JovaBaseVisitor<Block> {
 
     public List<SemanticError> semanticErrors;
+    public BlockVisitor(List<SemanticError> semanticErrors){
+        this.semanticErrors = semanticErrors;
+    }
     @Override
     public Block visitBlock(JovaParser.BlockContext ctx) {
         Block block = new Block();
@@ -29,6 +29,26 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
                 checkConflicts(declaration, block.declarations);
                 block.declarations.add(declaration);
+
+            } else if (ctx.getChild(i) instanceof JovaParser.ExprContext) {
+
+                Expression expression = expressionVisitor.visit(ctx.getChild(i));
+                block.expressions.add(expression);
+
+            } else if (ctx.getChild(i) instanceof JovaParser.If_stmtContext) {
+                
+                IfStatement ifStatement = ifStatementVisitor.visit((ctx.getChild(i)));
+                block.ifStatements.add(ifStatement);
+                
+            } else if (ctx.getChild(i) instanceof JovaParser.While_stmtContext) {
+                
+                WhileStatement whileStatement = whileStatementVisitor.visit(ctx.getChild(i));
+                block.whileStatements.add(whileStatement);
+                
+            } else if (ctx.getChild(i) instanceof  JovaParser.Return_stmtContext) {
+
+                ReturnStatement returnStatement = returnStatementVisitor.visit(ctx.getChild(i));
+                block.returnStatements.add(returnStatement);
 
             }
         }

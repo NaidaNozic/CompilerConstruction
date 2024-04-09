@@ -60,22 +60,19 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
             if (declarations != null)
                 for (Declaration declaration : declarations){
                     if (!declaration.params.isEmpty())
-                        checkUndefined(declaration.params.getFirst());
+                        checkUndefinedParam(declaration.params.getFirst());
                 }
 
             if (methods != null)
                 for (Method method : methods){
-                    checkUndefined(method.param);
+                    checkUndefinedParam(method.param);
 
                     for (Param param1 : method.paramList.params){
-                        checkUndefined(param1);
+                        checkUndefinedParam(param1);
                     }
-
-                    for (Declaration declaration : method.block.declarations){
-                        if (!declaration.params.isEmpty())
-                            checkUndefined(declaration.params.getFirst());
-                    }
+                    validateBlock(method.block);
                 }
+
             if(classDeclaration.superclass != null){
                 Optional<ClassDeclaration> prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(classDeclaration.superclass)).findFirst();
                 System.out.println("Tu smo");
@@ -100,6 +97,47 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         return program;
     }
 
+    private void validateBlock (Block block){
+        // Will be used to find the IDUnknownError
+        for (Declaration declaration : block.declarations) {
+            if (!declaration.params.isEmpty())
+                checkUndefinedParam(declaration.params.getFirst());
+
+            if (!declaration.expressions.isEmpty()) {
+                for (Expression expression : declaration.expressions) {
+                    if (expression instanceof NewClassExpression) {
+                        checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
+                    }
+                }
+            }
+        }
+        for (IfStatement ifStatement : block.ifStatements){
+            if (ifStatement.expression instanceof NewClassExpression){
+                checkUndefinedClassId(((NewClassExpression) ifStatement.expression).classId, ifStatement.expression.line);
+            }
+            validateBlock(ifStatement.thenBlock);
+            validateBlock(ifStatement.elseBlock);
+        }
+        for (WhileStatement whileStatement : block.whileStatements){
+            if (whileStatement.expression instanceof NewClassExpression){
+                checkUndefinedClassId(((NewClassExpression) whileStatement.expression).classId, whileStatement.expression.line);
+            }
+            validateBlock(whileStatement.block);
+        }
+
+        for (ReturnStatement returnStatement : block.returnStatements){
+            if (returnStatement.expression instanceof NewClassExpression){
+                checkUndefinedClassId(((NewClassExpression) returnStatement.expression).classId, returnStatement.expression.line);
+            }
+        }
+
+        for (Expression expression : block.expressions){
+            if (expression instanceof NewClassExpression){
+                checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
+            }
+        }
+    }
+
     private void checkMeths(Method meth, Method prev) {
         ArrayList<String> errorparams = new ArrayList<>();
         if(meth.paramList.params.size() != prev.paramList.params.size()) return;
@@ -122,7 +160,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         } else { return false; }
     }
 
-    public void checkUndefined(Param param) {
+    private void checkUndefinedParam(Param param) {
         if (param.type instanceof IntegerType
                 || param.type instanceof StringType
                 || param.type instanceof BoolType)
@@ -130,6 +168,12 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
         if(!classNames.contains(param.type.type)){
             semanticErrors.add(new IDUnknownError(param.type.type, param.line));
+        }
+    }
+
+    private void checkUndefinedClassId(String class_id, int line) {
+        if(!classNames.contains(class_id)){
+            semanticErrors.add(new IDUnknownError(class_id, line));
         }
     }
 }

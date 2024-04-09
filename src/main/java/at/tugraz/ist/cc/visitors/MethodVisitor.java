@@ -28,7 +28,7 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
         ParamList param_list = new ParamList();
         List<String> double_decl_list = new ArrayList<>();
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
-        BlockVisitor blockVisitor = new BlockVisitor();
+        BlockVisitor blockVisitor = new BlockVisitor(semanticErrors);
 
         for(int children = 0; children < ctx.getChildCount(); children++)
         {
