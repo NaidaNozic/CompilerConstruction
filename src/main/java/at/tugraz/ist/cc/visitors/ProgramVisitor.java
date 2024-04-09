@@ -63,16 +63,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
             if (declarations != null)
                 for (Declaration declaration : declarations){
-                    if (!declaration.params.isEmpty())
-                        checkUndefinedParam(declaration.params.getFirst());
-
-                    if (!declaration.expressions.isEmpty()) {
-                        for (Expression expression : declaration.expressions) {
-                            if (expression instanceof NewClassExpression) {
-                                checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
-                            }
-                        }
-                    }
+                    validateDeclarations(declaration);
                 }
 
             if (methods != null)
@@ -112,41 +103,66 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
     private void validateBlock (Block block){
         // Will be used to find the IDUnknownError
         for (Declaration declaration : block.declarations) {
-            if (!declaration.params.isEmpty())
-                checkUndefinedParam(declaration.params.getFirst());
-
-            if (!declaration.expressions.isEmpty()) {
-                for (Expression expression : declaration.expressions) {
-                    if (expression instanceof NewClassExpression) {
-                        checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
-                    }
-                }
-            }
+            validateDeclarations(declaration);
         }
         for (IfStatement ifStatement : block.ifStatements){
-            if (ifStatement.expression instanceof NewClassExpression){
-                checkUndefinedClassId(((NewClassExpression) ifStatement.expression).classId, ifStatement.expression.line);
-            }
+            validateExpression(ifStatement.expression);
             validateBlock(ifStatement.thenBlock);
             validateBlock(ifStatement.elseBlock);
         }
         for (WhileStatement whileStatement : block.whileStatements){
-            if (whileStatement.expression instanceof NewClassExpression){
-                checkUndefinedClassId(((NewClassExpression) whileStatement.expression).classId, whileStatement.expression.line);
-            }
+            validateExpression(whileStatement.expression);
             validateBlock(whileStatement.block);
         }
 
         for (ReturnStatement returnStatement : block.returnStatements){
-            if (returnStatement.expression instanceof NewClassExpression){
-                checkUndefinedClassId(((NewClassExpression) returnStatement.expression).classId, returnStatement.expression.line);
-            }
+            validateExpression(returnStatement.expression);
         }
 
         for (Expression expression : block.expressions){
-            if (expression instanceof NewClassExpression){
-                checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
+            validateExpression(expression);
+        }
+    }
+
+    private void validateDeclarations(Declaration declaration){
+        // Will be used to find the IDUnknownError
+        if (!declaration.params.isEmpty())
+            checkUndefinedParam(declaration.params.getFirst());
+
+        if (!declaration.expressions.isEmpty()) {
+            for (Expression expression : declaration.expressions) {
+                validateExpression(expression);
             }
+        }
+    }
+    private void validateExpression(Expression expression){
+        // Will be used to find the IDUnknownError
+        if (expression instanceof NewClassExpression) {
+            checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
+
+        } else if (expression instanceof IdExpression) {
+            for (Expression expression1 : ((IdExpression) expression).expressions){
+                validateExpression(expression1);
+            }
+
+        } else if (expression instanceof OperatorExpression) {
+            if (((OperatorExpression) expression).leftExpression instanceof NewClassExpression) {
+                checkUndefinedClassId(((NewClassExpression) ((OperatorExpression) expression).leftExpression).classId,
+                                       expression.line);
+            } else {
+                validateExpression(((OperatorExpression) expression).leftExpression);
+            }
+            if (((OperatorExpression) expression).rightExpression instanceof NewClassExpression) {
+                checkUndefinedClassId(((NewClassExpression) ((OperatorExpression) expression).rightExpression).classId,
+                                       expression.line);
+            } else {
+                validateExpression(((OperatorExpression) expression).rightExpression);
+            }
+
+        } else if (expression instanceof AddNotExpression) {
+            validateExpression(((AddNotExpression) expression).expression);
+        } else if (expression instanceof  ParanthesisExpression) {
+            validateExpression(((ParanthesisExpression) expression).expression);
         }
     }
 
