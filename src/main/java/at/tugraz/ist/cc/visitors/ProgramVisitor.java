@@ -65,6 +65,14 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                 for (Declaration declaration : declarations){
                     if (!declaration.params.isEmpty())
                         checkUndefinedParam(declaration.params.getFirst());
+
+                    if (!declaration.expressions.isEmpty()) {
+                        for (Expression expression : declaration.expressions) {
+                            if (expression instanceof NewClassExpression) {
+                                checkUndefinedClassId(((NewClassExpression) expression).classId, expression.line);
+                            }
+                        }
+                    }
                 }
 
             if (methods != null)
