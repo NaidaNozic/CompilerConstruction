@@ -1,0 +1,8 @@
+Krusty {
+    Cat a;
+    a = new Cat;
+}
+
+Cat {
+    int z;
+}

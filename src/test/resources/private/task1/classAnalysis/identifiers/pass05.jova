@@ -1,0 +1,12 @@
+Moon {
+    bool a;
+    a = true;
+    int test(){
+        if (a == new Star){
+            int z;
+        }
+    }
+}
+
+Star{
+}

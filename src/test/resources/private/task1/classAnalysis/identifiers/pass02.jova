@@ -1,0 +1,12 @@
+Krusty : Krab {
+    Fish a;
+    a = new Fish;
+}
+
+Krab {
+    Krusty method(bool l, Krusty k){}
+}
+
+Fish {
+    Krab krab;
+}

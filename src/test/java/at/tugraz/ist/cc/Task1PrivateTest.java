@@ -47,6 +47,14 @@ public class Task1PrivateTest {
         String path = path_canalysis;
         return Stream.of(
                 //positive cases
+                //identifiers
+                Arguments.of(path + "identifiers\\pass01.jova", true, false),
+                Arguments.of(path + "identifiers\\pass02.jova", true, false),
+                Arguments.of(path + "identifiers\\pass03.jova", true, false),
+                Arguments.of(path + "identifiers\\pass04.jova", true, false),
+                Arguments.of(path + "identifiers\\pass05.jova", true, false),
+                Arguments.of(path + "identifiers\\pass06.jova", true, false),
+
                 //methods
                 Arguments.of(path + "pass01.jova", true, false),
                 Arguments.of(path + "pass02.jova", true, false),
@@ -70,6 +78,13 @@ public class Task1PrivateTest {
 
 
                 // negative cases
+                //identifiers
+                Arguments.of(path + "identifiers\\fail01.jova", false, false),
+                Arguments.of(path + "identifiers\\fail02.jova", false, false),
+                Arguments.of(path + "identifiers\\fail03.jova", false, false),
+                Arguments.of(path + "identifiers\\fail04.jova", false, false),
+                Arguments.of(path + "identifiers\\fail05.jova", false, false),
+
                 //methods
                 Arguments.of(path + "fail01.jova", false, false),
                 Arguments.of(path + "fail02.jova", false, false),

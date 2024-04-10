@@ -1,0 +1,7 @@
+Moon {
+    bool flyToTheMoon(bool flyToTheMoon) {
+        return flyToTheMoon;
+    }
+    bool flyToTheMoon;
+    flyToTheMoon = false;
+}

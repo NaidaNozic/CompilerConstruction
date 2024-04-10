@@ -1,0 +1,5 @@
+Krusty : Krab {
+    Krusty a;
+    a = new Krusty;
+    a = new Unknown;
+}
