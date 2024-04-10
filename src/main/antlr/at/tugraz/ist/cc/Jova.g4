@@ -45,7 +45,7 @@ fragment UPPERCASE : [A-Z] ;
  // parser rules
  program : class_decl+;// EOF;
  class_decl : CLASS_ID (':' CLASS_ID )? '{' class_body '}' ;
- class_body : (decl | method)* ;
+ class_body : (decl | method | expr)* ;  //TODO check if that fixes
  method : param '(' param_list? ')' block ;
  type : KEY_INT | KEY_BOOL | KEY_STRING | CLASS_ID ;
  param : type ID;
