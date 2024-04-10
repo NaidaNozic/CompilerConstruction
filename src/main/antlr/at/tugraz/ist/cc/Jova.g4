@@ -50,7 +50,7 @@ fragment UPPERCASE : [A-Z] ;
  type : KEY_INT | KEY_BOOL | KEY_STRING | CLASS_ID ;
  param : type ID;
  param_list : param (',' param)* ;
- block : '{' (block | decl | if_stmt | while_stmt | return_stmt | expr ';')* '}' ;
+ block : '{' (decl | if_stmt | while_stmt | return_stmt | expr ';')* '}' ;
  decl : (param (',' ID)* ) ';' ;
  if_stmt : KEY_IF '(' expr ')' block (KEY_ELSE block)? ;
  while_stmt : KEY_WHILE '(' expr ')' block ;
