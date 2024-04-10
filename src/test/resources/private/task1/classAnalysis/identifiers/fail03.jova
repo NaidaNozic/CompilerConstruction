@@ -1,9 +1,12 @@
 Krusty {
     int method(Unknown a, int a1){
-        return 1;
+            return 1;
     }
-    int a;
-    method(new Krab, a);
+
+    bool method1(){
+        int a;
+        method(new Krab, a);
+    }
 }
 
 Krab {

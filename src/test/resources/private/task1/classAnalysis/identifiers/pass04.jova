@@ -2,6 +2,8 @@ Moon {
     bool flyToTheMoon(bool flyToTheMoon) {
         return flyToTheMoon;
     }
-    bool flyToTheMoon;
-    flyToTheMoon = false;
+    bool method(){
+        bool flyToTheMoon;
+        flyToTheMoon = false;
+    }
 }

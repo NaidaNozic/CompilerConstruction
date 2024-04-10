@@ -21,7 +21,6 @@ public class DeclarationVisitor extends JovaBaseVisitor<Declaration> {
     public Declaration visitDecl(JovaParser.DeclContext ctx) {
         Declaration declaration = new Declaration();
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
-        ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
 
         if (ctx.getChild(0) instanceof JovaParser.ParamContext) {
             Param param = paramVisitor.visit(ctx.getChild(0));
@@ -31,10 +30,6 @@ public class DeclarationVisitor extends JovaBaseVisitor<Declaration> {
                     declaration.params.add(new Param(param.type, ctx.getChild(i+1).getText(), param.line, 0));
                 }
             }
-//example comment
-        } else if (ctx.getChild(0) instanceof JovaParser.ExprContext) {
-            Expression expression = expressionVisitor.visit(ctx.getChild(0));
-            declaration.expressions.add(expression);
         }
 
         return declaration;

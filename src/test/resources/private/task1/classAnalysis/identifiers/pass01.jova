@@ -1,6 +1,8 @@
 Krusty {
-    Cat a;
-    a = new Cat;
+    int method(){
+        Cat a;
+        a = new Cat;
+    }
 }
 
 Cat {

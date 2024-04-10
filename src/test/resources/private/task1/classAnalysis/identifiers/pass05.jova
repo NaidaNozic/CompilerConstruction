@@ -1,6 +1,8 @@
 Moon {
     bool a;
-    a = true;
+    bool method(){
+        a = true;
+    }
     int test(){
         if (a == new Star){
             int z;

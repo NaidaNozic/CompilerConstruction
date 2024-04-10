@@ -128,12 +128,6 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         // Will be used to find the IDUnknownError
         if (!declaration.params.isEmpty())
             checkUndefinedParam(declaration.params.getFirst());
-
-        if (!declaration.expressions.isEmpty()) {
-            for (Expression expression : declaration.expressions) {
-                validateExpression(expression);
-            }
-        }
     }
     private void validateExpression(Expression expression){
         // Will be used to find the IDUnknownError

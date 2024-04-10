@@ -1,5 +1,7 @@
 Krusty : Krab {
-    Krusty a;
-    a = new Krusty;
-    a = new Unknown;
+    int method(){
+        Krusty a;
+        a = new Krusty;
+        a = new Unknown;
+    }
 }

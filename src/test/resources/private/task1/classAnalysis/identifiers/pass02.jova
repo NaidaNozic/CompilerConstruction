@@ -1,6 +1,8 @@
 Krusty : Krab {
-    Fish a;
-    a = new Fish;
+    int method(){
+        Fish a;
+        a = new Fish;
+    }
 }
 
 Krab {
