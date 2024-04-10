@@ -51,7 +51,7 @@ fragment UPPERCASE : [A-Z] ;
  param : type ID;
  param_list : param (',' param)* ;
  block : '{' (decl | if_stmt | while_stmt | return_stmt | expr ';')* '}' ;
- decl : (param (',' ID)* | expr) ';' ;
+ decl : (param (',' ID)* ) ';' ;
  if_stmt : KEY_IF '(' expr ')' block (KEY_ELSE block)? ;
  while_stmt : KEY_WHILE '(' expr ')' block ;
  return_stmt : KEY_RETURN expr ';' ;
