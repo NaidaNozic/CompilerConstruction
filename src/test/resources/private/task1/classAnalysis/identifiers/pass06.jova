@@ -1,0 +1,13 @@
+Moon {
+    int test(){
+        return new Star;
+    }
+}
+
+Star{
+    bool test(){
+        while( false != true){
+
+        }
+    }
+}

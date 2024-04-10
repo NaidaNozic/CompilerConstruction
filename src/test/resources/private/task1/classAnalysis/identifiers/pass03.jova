@@ -1,0 +1,15 @@
+Cat {
+    bool fightWithDog (bool b, Dog dog){
+            return b;
+    }
+    bool method(){
+        Dog dog;
+        fightWithDog(true, dog);
+    }
+}
+
+Dog {
+    bool fightWithCat (bool b, Cat cat){
+        return b;
+    }
+}
