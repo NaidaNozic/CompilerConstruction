@@ -48,14 +48,14 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitLiteralExpression(JovaParser.LiteralExpressionContext ctx) {
-        return super.visitLiteralExpression(ctx);
+        LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
+        return literalExpressionVisitor.visit(ctx.getChild(0));
     }
 
     @Override
     public Expression visitIdExpression(JovaParser.IdExpressionContext ctx) {
         IdExpressionVisitor idExpressionVisitor = new IdExpressionVisitor(semanticErrors);
-        IdExpression idExpression = idExpressionVisitor.visit(ctx.getChild(0));
-        return idExpression;
+        return idExpressionVisitor.visit(ctx.getChild(0));
     }
 
     @Override
@@ -67,6 +67,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         else if (ctx.ADDOP() != null) {
             operator = new Addop(ctx.ADDOP().getSymbol().getText(), ctx.ADDOP().getSymbol().getLine());
         }
+        assert operator != null;
         return new AddNotExpression(operator, visit(ctx.getChild(1)));
     }
 

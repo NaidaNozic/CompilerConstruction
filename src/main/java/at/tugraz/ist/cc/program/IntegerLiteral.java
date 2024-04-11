@@ -1,6 +1,6 @@
 package at.tugraz.ist.cc.program;
 
-public class IntegerLiteral extends Literal{
+public class IntegerLiteral extends LiteralExpression {
     public Integer integerType;
     public IntegerLiteral(Integer line, Integer integerType) {
         super(line);

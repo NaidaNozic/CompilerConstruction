@@ -1,6 +1,6 @@
 package at.tugraz.ist.cc.program;
 
-public class StringLiteral extends Literal{
+public class StringLiteral extends LiteralExpression {
 
     public String stringType;
 

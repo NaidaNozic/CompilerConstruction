@@ -71,4 +71,9 @@ fragment UPPERCASE : [A-Z] ;
         ;
 
  id_expr : ID ( '(' ( (expr ',')* expr )? ')')? ;
- literal : INT | BOOL | STRING | KEY_NIX | KEY_THIS ;
+ literal : INT      #IntegerLiteral
+         | BOOL     #BooleanLiteral
+         | STRING   #StringLiteral
+         | KEY_NIX  #NixLiteral
+         | KEY_THIS #ThisLiteral
+         ;

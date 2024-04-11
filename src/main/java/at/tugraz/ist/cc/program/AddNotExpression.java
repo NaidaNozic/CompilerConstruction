@@ -6,7 +6,7 @@ public class AddNotExpression extends Expression{
     public Expression expression;
 
     public AddNotExpression(Operator operator, Expression expression) {
-        super(operator.line);
+        super(expression.line);
         this.operator = operator;
         this.expression = expression;
     }
