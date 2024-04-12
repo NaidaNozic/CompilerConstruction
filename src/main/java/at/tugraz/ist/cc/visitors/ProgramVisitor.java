@@ -11,14 +11,11 @@ import at.tugraz.ist.cc.error.warning.OverrideWarning;
 import at.tugraz.ist.cc.program.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ProgramVisitor extends JovaBaseVisitor<Program> {
     public List<SemanticError> semanticErrors;
     public List<JovaWarning> jovaWarnings;
     private Set<String> classNames = new HashSet<>(); // To keep track of declared class names
-    private Map<String, String> inheritance = new HashMap<>(); // To check inherited classes
-    //key: class, value: superclass (since there can be only one)
     private ArrayList<ClassDeclaration> checkCycle = new ArrayList<>();
 
     private ArrayList<ClassDeclaration> confirmedCycle = new ArrayList<>();
@@ -43,23 +40,10 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
             checkCycle.add(classDeclaration);
 
-            String superclass = classDeclaration.superclass;
-            String baseclass = classDeclaration.id;
-            Integer errorline = 0;
-            //if (checkInheritance(superclass, baseclass)){
-            //    for(ClassDeclaration classdec : program.classDeclarations){
-            //        if(classdec.id.equals(classDeclaration.superclass)) errorline = classdec.line;
-            //    }
-            //    semanticErrors.add(new CyclicInheritanceError(classDeclaration.id, classDeclaration.superclass, errorline));
-            //}
-            System.out.println("_________________");
             program.classDeclarations.add(classDeclaration);
-            inheritance.put(baseclass, superclass);
-
         }
 
         for (ClassDeclaration classDeclaration : program.classDeclarations){
-            boolean viciousCycle = false;
 
             if (classDeclaration.superclass != null)
                 checkUndefinedClassId(classDeclaration.superclass,classDeclaration.line);
@@ -85,12 +69,8 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
             if(newCheckInheritance(checkCycle, classDeclaration)){
                 semanticErrors.add(new CyclicInheritanceError(classDeclaration.id, classDeclaration.superclass, classDeclaration.line));
-                viciousCycle = true;
+
                 checkCycle.remove(classDeclaration);
-            }
-            System.out.println("Potvrdjeni belajsuzi:");
-            for(ClassDeclaration x : confirmedCycle){
-                System.out.println(x.id);
             }
 
         }
@@ -101,7 +81,6 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                 do {
                     if (prevClass.isPresent()) {
                         ClassDeclaration truePrev = prevClass.get();
-                        System.out.println("posjecujemo " + truePrev.id + " od " + classDeclaration.id);
                         checkPredecessorMethods(classDeclaration, truePrev);
                         if (truePrev.superclass != null && !confirmedCycle.contains(truePrev))
                             prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(truePrev.superclass)).findFirst();
@@ -194,19 +173,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
             errorparams.add(meth.paramList.params.get(i).type.type);
         }
         jovaWarnings.add(new OverrideWarning(meth.param.id, errorparams, meth.param.line, meth.param.column));
-        System.out.println("Ista metoda " + meth.param.id);
     }
-
-
-    /*private boolean checkInheritance(String superclass, String baseclass) {
-        if(inheritance.containsKey(superclass)){
-            String checkClass = inheritance.get(superclass);
-            if(checkClass == null) return false;
-            System.out.println("Checking the new " + checkClass + " and " + baseclass);
-            if (checkClass.equals(baseclass)) return true;
-            return checkInheritance(checkClass, baseclass);
-        } else { return false; }
-    }*/
 
     private boolean newCheckInheritance(ArrayList<ClassDeclaration> checkList, ClassDeclaration baseclass){
         for(ClassDeclaration traverse : checkList){
