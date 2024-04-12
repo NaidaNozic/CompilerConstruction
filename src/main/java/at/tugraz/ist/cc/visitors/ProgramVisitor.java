@@ -82,22 +82,16 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
             if(classDeclaration.superclass != null){
                 Optional<ClassDeclaration> prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(classDeclaration.superclass)).findFirst();
-                System.out.println("Tu smo");
-                if(prevClass.isPresent()){
-                    ClassDeclaration truePrev = prevClass.get();
-                    System.out.println("Imamo prijasnju klasu: " + truePrev.id);
-                    List<Method> prevMeth = truePrev.classBody.methods;
-                    for(Method meth : methods){
-                        for(Method prev : prevMeth){
-                            System.out.println("Poredimo " + meth.param.id + " i " + prev.param.id);
-                            System.out.println("Imaju " + meth.param.type.type+ " i " + prev.param.type.type);
-                            if(meth.param.id.equals(prev.param.id) && meth.param.type.type.equals(prev.param.type.type)) {
-                                System.out.println("ista metoda " + meth.param.id);
-                                checkMeths(meth, prev);
-                            }
-                        }
+                boolean sclassExists = true;
+                do{
+                    if (prevClass.isPresent()) {
+                        ClassDeclaration truePrev = prevClass.get();
+                        checkPredecessorMethods(classDeclaration, truePrev);
+                        prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(truePrev.superclass)).findFirst();
                     }
-                }
+                    else
+                        sclassExists=false;
+                }while(sclassExists);
             }
 
             if(newCheckInheritance(checkCycle, classDeclaration)){
@@ -107,6 +101,17 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         }
 
         return program;
+    }
+
+    private void checkPredecessorMethods(ClassDeclaration current, ClassDeclaration superclass){
+        List<Method> prevMeth = superclass.classBody.methods;
+        for(Method meth : current.classBody.methods){
+            for(Method prev : prevMeth){
+                if(meth.param.id.equals(prev.param.id) && meth.param.type.type.equals(prev.param.type.type)) {
+                    checkMeths(meth, prev);
+                }
+            }
+        }
     }
 
     private void validateBlock (Block block){
@@ -169,10 +174,6 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         }
     }
 
-    private void checkClass(String supclass, int i){
-        //for()
-    }
-
     private void checkMeths(Method meth, Method prev) {
         ArrayList<String> errorparams = new ArrayList<>();
         if(meth.paramList.params.size() != prev.paramList.params.size()) return;
@@ -185,7 +186,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
     }
 
 
-    private boolean checkInheritance(String superclass, String baseclass) {
+    /*private boolean checkInheritance(String superclass, String baseclass) {
         if(inheritance.containsKey(superclass)){
             String checkClass = inheritance.get(superclass);
             if(checkClass == null) return false;
@@ -193,7 +194,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
             if (checkClass.equals(baseclass)) return true;
             return checkInheritance(checkClass, baseclass);
         } else { return false; }
-    }
+    }*/
 
     private boolean newCheckInheritance(ArrayList<ClassDeclaration> checkList, ClassDeclaration baseclass){
         for(ClassDeclaration traverse : checkList){
