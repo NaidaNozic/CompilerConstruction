@@ -21,6 +21,8 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
     //key: class, value: superclass (since there can be only one)
     private ArrayList<ClassDeclaration> checkCycle = new ArrayList<>();
 
+    private ArrayList<ClassDeclaration> confirmedCycle = new ArrayList<>();
+
     public ProgramVisitor(List<SemanticError> semanticErrors, List<JovaWarning> jovaWarnings){
         this.semanticErrors = semanticErrors;
         this.jovaWarnings = jovaWarnings;
@@ -57,6 +59,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         }
 
         for (ClassDeclaration classDeclaration : program.classDeclarations){
+            boolean viciousCycle = false;
 
             if (classDeclaration.superclass != null)
                 checkUndefinedClassId(classDeclaration.superclass,classDeclaration.line);
@@ -80,26 +83,35 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                     validateBlock(method.block);
                 }
 
-            if(classDeclaration.superclass != null){
-                Optional<ClassDeclaration> prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(classDeclaration.superclass)).findFirst();
-                boolean sclassExists = true;
-                do{
-                    if (prevClass.isPresent()) {
-                        ClassDeclaration truePrev = prevClass.get();
-                        checkPredecessorMethods(classDeclaration, truePrev);
-                        prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(truePrev.superclass)).findFirst();
-                    }
-                    else
-                        sclassExists=false;
-                }while(sclassExists);
-            }
-
             if(newCheckInheritance(checkCycle, classDeclaration)){
                 semanticErrors.add(new CyclicInheritanceError(classDeclaration.id, classDeclaration.superclass, classDeclaration.line));
+                viciousCycle = true;
                 checkCycle.remove(classDeclaration);
             }
-        }
+            System.out.println("Potvrdjeni belajsuzi:");
+            for(ClassDeclaration x : confirmedCycle){
+                System.out.println(x.id);
+            }
 
+        }
+        for (ClassDeclaration classDeclaration : program.classDeclarations) {
+            if (classDeclaration.superclass != null && !confirmedCycle.contains(classDeclaration)) {
+                Optional<ClassDeclaration> prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(classDeclaration.superclass)).findFirst();
+                boolean sclassExists = true;
+                do {
+                    if (prevClass.isPresent()) {
+                        ClassDeclaration truePrev = prevClass.get();
+                        System.out.println("posjecujemo " + truePrev.id + " od " + classDeclaration.id);
+                        checkPredecessorMethods(classDeclaration, truePrev);
+                        if (truePrev.superclass != null && !confirmedCycle.contains(truePrev))
+                            prevClass = program.classDeclarations.stream().filter(x -> x.id.equals(truePrev.superclass)).findFirst();
+                        else
+                            sclassExists = false;
+                    } else
+                        sclassExists = false;
+                } while (sclassExists);
+            }
+        }
         return program;
     }
 
@@ -200,7 +212,11 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         for(ClassDeclaration traverse : checkList){
             if(traverse.id.equals(baseclass.superclass)){
                 if(traverse.superclass == null) return false;
-                if(traverse.superclass.equals(baseclass.id)) return true;
+                if(traverse.superclass.equals(baseclass.id)){
+                    confirmedCycle.add(baseclass);
+                    confirmedCycle.add(traverse);
+                    return true;
+                }
                 ClassDeclaration temp = new ClassDeclaration(baseclass.id, traverse.superclass, baseclass.classBody, baseclass.line);
                 ArrayList<ClassDeclaration> removed = new ArrayList<>(checkList.stream().filter(elem -> !elem.id.equals(traverse.id)).toList());
                 return newCheckInheritance(removed, temp);

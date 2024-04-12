@@ -9,9 +9,9 @@ Framework tested with OpenJDK21 + gradle 8.5
 Group18
 
 Leo Trojnar    (11743053)   leo.trojnar@student.tugraz.at
-Miriam Musterfrau (1630002)   miriam.musterfrau@student.tugraz.at
-Jane Doe          (1630003)   jane.doe@student.tugraz.at
-John Doe          (1630004)   john.doe@student.tugraz.at
+Naida Nozic    (12336462)   naida.nozic@student.tugraz.at
+Faruk Hamzic   (12346498)   faruk.hamzic@student.tugraz.at
+Faruk Sahat    (12336460)   faruk.sahat@student.tugraz.at
 
 # The group name can contain letters, digits and spaces
 # Note that it and the points reached on the testsystem are visible publicly
