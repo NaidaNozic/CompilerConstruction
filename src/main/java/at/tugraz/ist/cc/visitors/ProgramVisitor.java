@@ -11,6 +11,7 @@ import at.tugraz.ist.cc.error.warning.OverrideWarning;
 import at.tugraz.ist.cc.program.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProgramVisitor extends JovaBaseVisitor<Program> {
     public List<SemanticError> semanticErrors;
@@ -18,6 +19,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
     private Set<String> classNames = new HashSet<>(); // To keep track of declared class names
     private Map<String, String> inheritance = new HashMap<>(); // To check inherited classes
     //key: class, value: superclass (since there can be only one)
+    private ArrayList<ClassDeclaration> checkCycle = new ArrayList<>();
 
     public ProgramVisitor(List<SemanticError> semanticErrors, List<JovaWarning> jovaWarnings){
         this.semanticErrors = semanticErrors;
@@ -37,16 +39,18 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                 classNames.add(classDeclaration.id);
             }
 
+            checkCycle.add(classDeclaration);
+
             String superclass = classDeclaration.superclass;
             String baseclass = classDeclaration.id;
             Integer errorline = 0;
-            if (checkInheritance(superclass, baseclass)){
-                for(ClassDeclaration classdec : program.classDeclarations){
-                    if(classdec.id.equals(classDeclaration.superclass)) errorline = classdec.line;
-                }
-                semanticErrors.add(new CyclicInheritanceError(classDeclaration.id, classDeclaration.superclass, errorline));
-            }
-
+            //if (checkInheritance(superclass, baseclass)){
+            //    for(ClassDeclaration classdec : program.classDeclarations){
+            //        if(classdec.id.equals(classDeclaration.superclass)) errorline = classdec.line;
+            //    }
+            //    semanticErrors.add(new CyclicInheritanceError(classDeclaration.id, classDeclaration.superclass, errorline));
+            //}
+            System.out.println("_________________");
             program.classDeclarations.add(classDeclaration);
             inheritance.put(baseclass, superclass);
 
@@ -94,6 +98,11 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                         }
                     }
                 }
+            }
+
+            if(newCheckInheritance(checkCycle, classDeclaration)){
+                semanticErrors.add(new CyclicInheritanceError(classDeclaration.id, classDeclaration.superclass, classDeclaration.line));
+                checkCycle.remove(classDeclaration);
             }
         }
 
@@ -160,6 +169,10 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         }
     }
 
+    private void checkClass(String supclass, int i){
+        //for()
+    }
+
     private void checkMeths(Method meth, Method prev) {
         ArrayList<String> errorparams = new ArrayList<>();
         if(meth.paramList.params.size() != prev.paramList.params.size()) return;
@@ -180,6 +193,19 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
             if (checkClass.equals(baseclass)) return true;
             return checkInheritance(checkClass, baseclass);
         } else { return false; }
+    }
+
+    private boolean newCheckInheritance(ArrayList<ClassDeclaration> checkList, ClassDeclaration baseclass){
+        for(ClassDeclaration traverse : checkList){
+            if(traverse.id.equals(baseclass.superclass)){
+                if(traverse.superclass == null) return false;
+                if(traverse.superclass.equals(baseclass.id)) return true;
+                ClassDeclaration temp = new ClassDeclaration(baseclass.id, traverse.superclass, baseclass.classBody, baseclass.line);
+                ArrayList<ClassDeclaration> removed = new ArrayList<>(checkList.stream().filter(elem -> !elem.id.equals(traverse.id)).toList());
+                return newCheckInheritance(removed, temp);
+            }
+        }
+        return false;
     }
 
     private void checkUndefinedParam(Param param) {
