@@ -2,13 +2,12 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.SymbolTable;
+import at.tugraz.ist.cc.SymbolTableStorage;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.ClassBody;
-import at.tugraz.ist.cc.program.Declaration;
-import at.tugraz.ist.cc.program.Method;
-import at.tugraz.ist.cc.program.Param;
+import at.tugraz.ist.cc.program.*;
 import org.antlr.v4.codegen.model.decl.Decl;
 
 import java.util.*;
@@ -28,14 +27,43 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         DeclarationVisitor declarationVisitor = new DeclarationVisitor(semanticErrors);
         MethodVisitor methodVisitor = new MethodVisitor(semanticErrors);
 
+        SymbolTable classSymbolTable = SymbolTableStorage.popSymbolTableStack();
+
+
         for (int i=0; i<ctx.getChildCount(); i++){
             if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
                 Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
                 checkConflicts(declaration, classBody.declarations);
                 classBody.declarations.add(declaration);
 
+                classSymbolTable.updateSymbolTable(declaration);
+
             }
             else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+
+                //-------------- only to collect all methods for the symbol table -------------
+                String id = ((JovaParser.MethodContext) ctx.getChild(i)).param().ID().getText();
+                TypeVisitor typeVisitor = new TypeVisitor(semanticErrors);
+
+                Type type = typeVisitor.visit(((JovaParser.MethodContext) ctx.getChild(i)).param().type());
+
+                classSymbolTable.updateSymbolTable(new Method(id, type));
+                //------------------------------------------------------------------------------
+            }
+        }
+
+        SymbolTableStorage.pushSymbolTableStack(classSymbolTable);
+
+        //now check the methods
+        for (int i=0; i<ctx.getChildCount(); i++){
+            if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+                SymbolTable methodSymbolTable = new SymbolTable((((JovaParser.MethodContext) ctx.getChild(i)).param()).ID().getText(),
+                        classSymbolTable);
+
+                SymbolTableStorage.addSymbolTableToStorage(methodSymbolTable);
+                SymbolTableStorage.pushSymbolTableStack(methodSymbolTable);
+
+
                 Method method = methodVisitor.visit(ctx.getChild(i));
                 checkBuiltInFunctions(method);
                 checkMethodConflicts(method, classBody.methods);

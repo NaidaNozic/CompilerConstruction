@@ -2,6 +2,8 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.SymbolTable;
+import at.tugraz.ist.cc.SymbolTableStorage;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
@@ -28,7 +30,8 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
         ParamList param_list = new ParamList();
         List<String> double_decl_list = new ArrayList<>();
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
-        BlockVisitor blockVisitor = new BlockVisitor(semanticErrors);
+
+        SymbolTable methodSymbolTable = SymbolTableStorage.popSymbolTableStack();
 
         for(int children = 0; children < ctx.getChildCount(); children++)
         {
@@ -45,20 +48,31 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
                         double_decl_list.add(param.id);
 
                         param_list.params.add(param);
+
+                        methodSymbolTable.updateSymbolTable(param);
+
+
                     }
                 }
             }
         }
 
+        SymbolTableStorage.pushSymbolTableStack(methodSymbolTable);
 
-    if(param_list.params.isEmpty()){
-        return new Method(blockVisitor.visit(ctx.getChild(3)),
+        BlockVisitor blockVisitor = new BlockVisitor(semanticErrors, param_list);
+
+        Block block;
+        if(param_list.params.isEmpty()){
+            block = blockVisitor.visit(ctx.getChild(3));
+
+        } else {
+            block = blockVisitor.visit(ctx.getChild(4));
+
+        }
+
+
+        return new Method(block,
                           param_list,
                           paramVisitor.visit(ctx.getChild(0)));
-    }
-
-    return new Method(blockVisitor.visit(ctx.getChild(4)),
-                      param_list,
-                      paramVisitor.visit(ctx.getChild(0)));
     }
 }

@@ -2,8 +2,10 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.error.semantic.AssignmentExpectedError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
+import org.antlr.v4.runtime.RuleContext;
 
 import java.util.List;
 

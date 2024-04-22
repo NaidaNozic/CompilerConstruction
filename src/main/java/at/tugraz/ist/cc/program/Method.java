@@ -1,5 +1,8 @@
 package at.tugraz.ist.cc.program;
 
+import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.visitors.TypeVisitor;
+
 public class Method {
     public Block block;
     public ParamList paramList;
@@ -9,5 +12,11 @@ public class Method {
         this.block = block;
         this.paramList = paramList;
         this.param = param;
+    }
+
+    //helper to collect symbol table values
+    public Method(String id, Type type) {
+        param = new Param(type, id, -1, -1);
+
     }
 }

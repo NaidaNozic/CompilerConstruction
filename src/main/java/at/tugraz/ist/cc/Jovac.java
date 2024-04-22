@@ -103,7 +103,12 @@ public class Jovac {
      *        A string representing the path to the input .jova file.
      */
     public void task2(String file_path) {
-        // TODO: Implement Task 2.
+        CharStream input;
+        try {
+            input = CharStreams.fromFileName(file_path);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
 
