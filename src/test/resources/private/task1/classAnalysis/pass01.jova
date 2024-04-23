@@ -3,9 +3,7 @@ Class {
 
     int child_1()
     {
-        int a, b, c;
-
-        true;
+        undef();
     }
 
 

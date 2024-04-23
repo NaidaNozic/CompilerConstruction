@@ -57,6 +57,7 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
             }
         }
 
+
         SymbolTableStorage.pushSymbolTableStack(methodSymbolTable);
 
         BlockVisitor blockVisitor = new BlockVisitor(semanticErrors, param_list);
@@ -70,9 +71,11 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
 
         }
 
+        Method method = new Method(block, param_list, paramVisitor.visit(ctx.getChild(0)));
 
-        return new Method(block,
-                          param_list,
-                          paramVisitor.visit(ctx.getChild(0)));
+        methodSymbolTable.updateSymbolTable(method);
+
+
+        return method;
     }
 }
