@@ -22,12 +22,23 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
         ClassDeclaration classDeclaration;
         ClassBodyVisitor classBodyVisitor = new ClassBodyVisitor(semanticErrors);
 
-
         String id= ctx.getChild(0).getText();
         int line =ctx.CLASS_ID(0).getSymbol().getLine();
+
+        if(SymbolTableStorage.getMode()) {
+            SymbolTable classTable = new SymbolTable(id);
+
+            SymbolTableStorage.addSymbolTableToStorage(classTable);
+            SymbolTableStorage.pushSymbolTableStack(classTable);
+
+            classBodyVisitor.visit(ctx.getChild(2));
+
+            return new ClassDeclaration(id, null, -1);
+        }
+
+
         if(Objects.equals(ctx.getChild(1).getText(), "{")) {
-            SymbolTable classSymbolTable = new SymbolTable(id);
-            SymbolTableStorage.addSymbolTableToStorage(classSymbolTable);
+            SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
             SymbolTableStorage.pushSymbolTableStack(classSymbolTable);
 
 
@@ -41,8 +52,8 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
         } else {
             String superclass = ctx.getChild(2).getText();
 
-            SymbolTable classSymbolTable = new SymbolTable(id, superclass);
-            SymbolTableStorage.addSymbolTableToStorage(classSymbolTable);
+            SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
+            classSymbolTable.addBaseClass(SymbolTableStorage.getSymbolTableFromStorage(superclass));
             SymbolTableStorage.pushSymbolTableStack(classSymbolTable);
 
 
@@ -50,7 +61,7 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
             List<String> methods = null; // getMethods(classBody);
             List<String> declarations = null; // getDeclarations(classBody);
             classDeclaration = new ClassDeclaration(id, superclass, classBody, line);
-            //TODO work on inheritance combined with symbol tables later, should be done by now
+
             return classDeclaration;
         }
     }

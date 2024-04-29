@@ -1,10 +1,12 @@
-Class {
+Ju {
+int a, b;
+
+bool meth(int param){}
+}
 
 
-    int child_1()
-    {
-        undef();
-    }
+Tobi {
+int a, b;
 
-
+string meth2(int param){}
 }

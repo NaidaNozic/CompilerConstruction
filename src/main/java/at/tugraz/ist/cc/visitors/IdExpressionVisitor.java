@@ -9,12 +9,10 @@ import at.tugraz.ist.cc.error.semantic.MethodUnknownError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.Expression;
 import at.tugraz.ist.cc.program.IdExpression;
+import at.tugraz.ist.cc.program.Type;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
@@ -33,21 +31,19 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         //TODO e.g.: undef(a, unknown)
         //TODO and if only the method name is relevant to check or the whole signature (with passed params)
 
-        Expression expr = null;
 
         for (int i = 2; i < ctx.getChildCount(); i += 2) {
-            expr = expressionVisitor.visit(ctx.getChild(i));
+            Expression expr = expressionVisitor.visit(ctx.getChild(i));
 
             if(expr != null)
             {
-                idExpression.expressions.add(expressionVisitor.visit(ctx.getChild(i)));
+                idExpression.expressions.add(expr);
             }
         }
         
 
         if (!currentMethodScope.getSymbolTable().containsKey(idExpression.Id)) {
-
-            if (idExpression.expressions.isEmpty() && expr != null) {
+            if (idExpression.expressions.isEmpty()) {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));
             } else {
                 Collection<String> arg_types = new ArrayList<>();
@@ -58,7 +54,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
                 semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
             }
-
         }
 
 

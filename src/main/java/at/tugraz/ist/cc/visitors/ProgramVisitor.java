@@ -31,6 +31,15 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         Program program = new Program();
         ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor(semanticErrors);
 
+        //-------------------------------------------------------------------------------
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            classDeclarationVisitor.visit(ctx.getChild(i));
+        }
+
+        //before that collect all decls and methods for symbol tables, after start with actual
+        SymbolTableStorage.switchMode();
+        //-------------------------------------------------------------------------------
+
         for (int i = 0; i < ctx.getChildCount(); i++){
             ClassDeclaration classDeclaration = classDeclarationVisitor.visit(ctx.getChild(i));
 

@@ -67,8 +67,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 if (expression instanceof OperatorExpression &&
                     !(((OperatorExpression) expression).operator).equals("=")){
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
-                } else if (expression instanceof IdExpression) {
-                    //TODO handle methods and IDs, i guess idexp should not handle method calls;
                 } else if (expression instanceof IntegerLiteral ||
                            expression instanceof BooleanLiteral ||
                            expression instanceof StringLiteral) {

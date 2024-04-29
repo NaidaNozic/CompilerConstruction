@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Symbol {
     public enum SymbolType {
-        VARIABLE, METHOD, PARAMETER, BUILT_IN
+        CLASS, VARIABLE, METHOD, PARAMETER, BUILT_IN
     }
 
     private String id;
@@ -18,17 +18,23 @@ public class Symbol {
     private SymbolType symbolType;
     private ArrayList<Symbol> paramSymbols; //only for method params
 
+    //variable or param
+    public Symbol(String id_, Type type_, SymbolType symbolType_) {
+        id = id_;
+        type = type_;
+        symbolType = symbolType_;
+    }
+
+    //method
     public Symbol(String id_, Type type_, SymbolType symbolType_, ParamList params) {
         id = id_;
         type = type_;
         symbolType = symbolType_;
+        paramSymbols = new ArrayList<>();
 
-        if(params != null) {
-            paramSymbols = new ArrayList<>();
 
-            for (Param p : params.params) {
-                paramSymbols.add(new Symbol(p.id, p.type, SymbolType.PARAMETER, null));
-            }
+        for (Param p : params.params) {
+            paramSymbols.add(new Symbol(p.id, p.type, SymbolType.PARAMETER));
         }
     }
 

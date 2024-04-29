@@ -13,10 +13,4 @@ public class Method {
         this.paramList = paramList;
         this.param = param;
     }
-
-    //helper to collect symbol table values
-    public Method(String id, Type type) {
-        param = new Param(type, id, -1, -1);
-
-    }
 }

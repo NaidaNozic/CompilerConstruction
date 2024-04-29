@@ -31,6 +31,25 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
         List<String> double_decl_list = new ArrayList<>();
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
 
+        if(SymbolTableStorage.getMode()) {
+            for(int children = 0; children < ctx.getChildCount(); children++)
+            {
+                if(ctx.getChild(children) instanceof JovaParser.Param_listContext){
+                    for(int params = 0; params < ctx.getChild(children).getChildCount(); params++){
+
+                        if(ctx.getChild(children).getChild(params) instanceof JovaParser.ParamContext){
+                            param_list.params.add(paramVisitor.visit(ctx.getChild(2).getChild(params)));
+
+                        }
+                    }
+                }
+            }
+
+            return new Method(null, param_list, paramVisitor.visit(ctx.getChild(0)));
+        }
+
+
+
         SymbolTable methodSymbolTable = SymbolTableStorage.popSymbolTableStack();
 
         for(int children = 0; children < ctx.getChildCount(); children++)
@@ -51,7 +70,6 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
 
                         methodSymbolTable.updateSymbolTable(param);
 
-
                     }
                 }
             }
@@ -71,11 +89,7 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
 
         }
 
-        Method method = new Method(block, param_list, paramVisitor.visit(ctx.getChild(0)));
 
-        methodSymbolTable.updateSymbolTable(method);
-
-
-        return method;
+        return new Method(block, param_list, paramVisitor.visit(ctx.getChild(0)));
     }
 }

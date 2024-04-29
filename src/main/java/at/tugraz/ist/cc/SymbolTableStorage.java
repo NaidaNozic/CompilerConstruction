@@ -10,6 +10,7 @@ public class SymbolTableStorage {
 
     private static HashMap<String, SymbolTable> symbolTableStorage = new HashMap<>();
     private static Stack<SymbolTable> symbolTableStack = new Stack<>();
+    private static boolean collectClassBodyContent = true;
 
     public static void addSymbolTableToStorage(SymbolTable symbol_table) {
         symbolTableStorage.put(symbol_table.getScopeId(), symbol_table);
@@ -32,5 +33,13 @@ public class SymbolTableStorage {
     public static SymbolTable popSymbolTableStack() {
         assert !symbolTableStack.isEmpty() : "Size of stack should higher than 0";
         return symbolTableStack.pop();
+    }
+
+    public static void switchMode(){
+        collectClassBodyContent = !collectClassBodyContent;
+    }
+
+    public static boolean getMode(){
+        return collectClassBodyContent;
     }
 }

@@ -12,28 +12,21 @@ public class SymbolTable {
     private SymbolTable parent;
     private ArrayList<SymbolTable> children;
 
+    private SymbolTable baseClass;
+
     //symboltable for classes
     public SymbolTable(String scope_id) {
         scopeId = scope_id;
         symbolTable = new HashMap<>();
         children = new ArrayList<>();
 
-        //TODO diese builtins einbauen
-        symbolTable.put("printInt", new Symbol("printInt"))
-    }
-
-    //Inheritance
-    public SymbolTable(String scope_id, String superclass) {
-        scopeId = scope_id;
-        symbolTable = new HashMap<>(SymbolTableStorage.getSymbolTableFromStorage(superclass).symbolTable);
-        children = new ArrayList<>();
     }
 
 
     //symboltable for methods
     public SymbolTable(String scope_id, SymbolTable parent_){
         scopeId = scope_id;
-        symbolTable = new HashMap<>(parent_.symbolTable); //to shadow declarations from child to parent, but not overwrite parent
+        symbolTable = new HashMap<>(parent_.symbolTable); //to shadow declarations from parent to child, but not overwrite parent
 
         parent = parent_;
         addSelfToParent(parent_);
@@ -43,30 +36,32 @@ public class SymbolTable {
         parent.children.add(this);
     }
 
+    public void addBaseClass(SymbolTable base_class) {
+        baseClass = base_class;
+    }
+
+    public SymbolTable getBaseClass() {
+        return baseClass;
+    }
+
+    public SymbolTable getParent() {
+        return parent;
+    }
+
 
     //---------------- one element to update ----------------------------------------------------------------------
     public void updateSymbolTable(Param param){
-        symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.PARAMETER, null));
+        symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.PARAMETER));
     }
 
     public void updateSymbolTable(Declaration declaration){
         for (Param param : declaration.params) {
-            symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE, null));
+            symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
         }
     }
 
     public void updateSymbolTable(Method method) {
-        //to get all the methods when traversing the class body
-        if (method.paramList == null) {
-            symbolTable.put(method.param.id, new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, null));
-        }
-        //to update the method's parameter information and update the other functions
-        else {
-            for (SymbolTable child_table : parent.children){
-                child_table.symbolTable.put(method.param.id, new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
-            }
-        }
-
+        symbolTable.put(method.param.id, new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
     }
     //-------------------------------------------------------------------------------------------------------------
 
