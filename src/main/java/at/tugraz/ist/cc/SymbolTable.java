@@ -4,6 +4,7 @@ import at.tugraz.ist.cc.program.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class SymbolTable {
 
@@ -26,7 +27,7 @@ public class SymbolTable {
     //symboltable for methods
     public SymbolTable(String scope_id, SymbolTable parent_){
         scopeId = scope_id;
-        symbolTable = new HashMap<>(parent_.symbolTable); //to shadow declarations from parent to child, but not overwrite parent
+        symbolTable = new HashMap<>();
 
         parent = parent_;
         addSelfToParent(parent_);
@@ -34,6 +35,10 @@ public class SymbolTable {
 
     private void addSelfToParent(SymbolTable parent) {
         parent.children.add(this);
+    }
+
+    public void copyClassSymbolTable(SymbolTable classtable) {
+        symbolTable.putAll(classtable.symbolTable);
     }
 
     public void addBaseClass(SymbolTable base_class) {
@@ -46,6 +51,15 @@ public class SymbolTable {
 
     public SymbolTable getParent() {
         return parent;
+    }
+
+    public SymbolTable getChild(String child_id) {
+        for (SymbolTable child : children) {
+            if(Objects.equals(child_id, child.scopeId)){
+                return child;
+            }
+        }
+        return null;
     }
 
 

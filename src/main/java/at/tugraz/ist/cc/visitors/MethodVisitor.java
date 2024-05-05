@@ -47,49 +47,48 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
 
             return new Method(null, param_list, paramVisitor.visit(ctx.getChild(0)));
         }
+        else {
+            String method_scope_id = SymbolTableStorage.getMethodScopeIDFromStack();
+            SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
 
+            for(int children = 0; children < ctx.getChildCount(); children++)
+            {
+                if(ctx.getChild(children) instanceof JovaParser.Param_listContext){
+                    for(int params = 0; params < ctx.getChild(children).getChildCount(); params++){
 
+                        if(ctx.getChild(children).getChild(params) instanceof JovaParser.ParamContext){
 
-        SymbolTable methodSymbolTable = SymbolTableStorage.popSymbolTableStack();
+                            Param param = paramVisitor.visit(ctx.getChild(2).getChild(params));
 
-        for(int children = 0; children < ctx.getChildCount(); children++)
-        {
-            if(ctx.getChild(children) instanceof JovaParser.Param_listContext){
-                for(int params = 0; params < ctx.getChild(children).getChildCount(); params++){
+                            if(double_decl_list.contains(param.id)){
+                                semanticErrors.add(new IDDoubleDeclError(param.id, param.line));
+                            }
+                            double_decl_list.add(param.id);
 
-                    if(ctx.getChild(children).getChild(params) instanceof JovaParser.ParamContext){
+                            param_list.params.add(param);
 
-                        Param param = paramVisitor.visit(ctx.getChild(2).getChild(params));
+                            method_symbol_table.updateSymbolTable(param);
 
-                        if(double_decl_list.contains(param.id)){
-                            semanticErrors.add(new IDDoubleDeclError(param.id, param.line));
                         }
-                        double_decl_list.add(param.id);
-
-                        param_list.params.add(param);
-
-                        methodSymbolTable.updateSymbolTable(param);
-
                     }
                 }
             }
+
+
+
+            BlockVisitor blockVisitor = new BlockVisitor(semanticErrors, param_list);
+
+            Block block;
+            if(param_list.params.isEmpty()){
+                block = blockVisitor.visit(ctx.getChild(3));
+
+            } else {
+                block = blockVisitor.visit(ctx.getChild(4));
+
+            }
+
+
+            return new Method(block, param_list, paramVisitor.visit(ctx.getChild(0)));
         }
-
-
-        SymbolTableStorage.pushSymbolTableStack(methodSymbolTable);
-
-        BlockVisitor blockVisitor = new BlockVisitor(semanticErrors, param_list);
-
-        Block block;
-        if(param_list.params.isEmpty()){
-            block = blockVisitor.visit(ctx.getChild(3));
-
-        } else {
-            block = blockVisitor.visit(ctx.getChild(4));
-
-        }
-
-
-        return new Method(block, param_list, paramVisitor.visit(ctx.getChild(0)));
     }
 }

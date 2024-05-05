@@ -49,4 +49,6 @@ public class Symbol {
     public SymbolType getSymbolType() {
         return symbolType;
     }
+
+    public ArrayList<Symbol> getParamSymbols() { return paramSymbols; }
 }

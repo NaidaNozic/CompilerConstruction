@@ -6,9 +6,7 @@ import at.tugraz.ist.cc.SymbolTable;
 import at.tugraz.ist.cc.SymbolTableStorage;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
-import org.antlr.v4.runtime.Token;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,41 +27,47 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
             SymbolTable classTable = new SymbolTable(id);
 
             SymbolTableStorage.addSymbolTableToStorage(classTable);
-            SymbolTableStorage.pushSymbolTableStack(classTable);
+            SymbolTableStorage.pushScopeID(id);
 
-            classBodyVisitor.visit(ctx.getChild(2));
+            if (ctx.getChildCount() == 4)
+                classBodyVisitor.visit(ctx.getChild(2));
+            else
+                classBodyVisitor.visit(ctx.getChild(4)); //inheritance
 
-            return new ClassDeclaration(id, null, -1);
-        }
-
-
-        if(Objects.equals(ctx.getChild(1).getText(), "{")) {
-            SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
-            SymbolTableStorage.pushSymbolTableStack(classSymbolTable);
-
-
-            ClassBody classBody = classBodyVisitor.visit(ctx.getChild(2));
-            List<String> methods = null; //getMethods(classBody);
-            List<String> declarations = null; //getDeclarations(classBody);
-            classDeclaration = new ClassDeclaration(id, classBody, line);
-
-            SymbolTableStorage.popSymbolTableStack();
-            return classDeclaration;
+            return null;
         } else {
-            String superclass = ctx.getChild(2).getText();
-
-            SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
-            classSymbolTable.addBaseClass(SymbolTableStorage.getSymbolTableFromStorage(superclass));
-            SymbolTableStorage.pushSymbolTableStack(classSymbolTable);
+            if(Objects.equals(ctx.getChild(1).getText(), "{")) {
+                SymbolTable class_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(id);
+                SymbolTableStorage.pushScopeID(id);
 
 
-            ClassBody classBody = classBodyVisitor.visit(ctx.getChild(4));
-            List<String> methods = null; // getMethods(classBody);
-            List<String> declarations = null; // getDeclarations(classBody);
-            classDeclaration = new ClassDeclaration(id, superclass, classBody, line);
+                ClassBody classBody = classBodyVisitor.visit(ctx.getChild(2));
+                List<String> methods = null; //getMethods(classBody);
+                List<String> declarations = null; //getDeclarations(classBody);
+                classDeclaration = new ClassDeclaration(id, classBody, line);
 
-            return classDeclaration;
+
+                return classDeclaration;
+            } else {
+                String superclass = ctx.getChild(2).getText();
+
+                SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
+                classSymbolTable.addBaseClass(SymbolTableStorage.getSymbolTableFromStorage(superclass));
+                SymbolTableStorage.pushScopeID(id);
+
+
+                ClassBody classBody = classBodyVisitor.visit(ctx.getChild(4));
+                List<String> methods = null; // getMethods(classBody);
+                List<String> declarations = null; // getDeclarations(classBody);
+                classDeclaration = new ClassDeclaration(id, superclass, classBody, line);
+
+
+                return classDeclaration;
+            }
         }
+
+
+
     }
 }
 

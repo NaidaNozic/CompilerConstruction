@@ -1,12 +1,15 @@
-Ju {
-int a, b;
-
-bool meth(int param){}
+Base {
+ int hi(int b) {}
 }
 
 
-Tobi {
-int a, b;
+Derived : Base {
 
-string meth2(int param){}
+
+
+    int meth(int a) {
+        hi(me(1));
+    }
 }
+
+

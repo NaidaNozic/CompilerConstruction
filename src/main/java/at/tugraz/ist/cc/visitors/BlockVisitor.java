@@ -1,9 +1,6 @@
 package at.tugraz.ist.cc.visitors;
 
-import at.tugraz.ist.cc.JovaBaseVisitor;
-import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.SymbolTable;
-import at.tugraz.ist.cc.SymbolTableStorage;
+import at.tugraz.ist.cc.*;
 import at.tugraz.ist.cc.error.semantic.AssignmentExpectedError;
 import at.tugraz.ist.cc.error.semantic.CannotDeclVarError;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
@@ -17,6 +14,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
     private ParamList methodParams;
     public List<SemanticError> semanticErrors;
+    SymbolTable method_symbol_table;
     public BlockVisitor(List<SemanticError> semanticErrors, ParamList methodParams_){
 
         this.semanticErrors = semanticErrors;
@@ -31,7 +29,8 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         ReturnStatementVisitor returnStatementVisitor = new ReturnStatementVisitor(semanticErrors);
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
 
-        SymbolTable methodSymboltable = SymbolTableStorage.popSymbolTableStack();
+        String method_scope_id = SymbolTableStorage.getMethodScopeIDFromStack();
+        method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
 
         for(int i=0; i<ctx.getChildCount(); i++){
             if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
@@ -40,7 +39,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 checkConflicts(declaration, block.declarations);
                 block.declarations.add(declaration);
 
-                methodSymboltable.updateSymbolTable(declaration);
+                method_symbol_table.updateSymbolTable(declaration);
 
                 if(ctx.parent instanceof JovaParser.If_stmtContext ||
                    ctx.parent instanceof JovaParser.While_stmtContext){
@@ -59,7 +58,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
             } else if (ctx.getChild(i) instanceof JovaParser.ExprContext) {
 
-                SymbolTableStorage.pushSymbolTableStack(methodSymboltable);
 
                 Expression expression = expressionVisitor.visit(ctx.getChild(i));
                 block.expressions.add(expression);
@@ -71,10 +69,10 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                            expression instanceof BooleanLiteral ||
                            expression instanceof StringLiteral) {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
+                } else if (expression instanceof IdExpression && checkIfMethod((IdExpression) expression)) {
+                    semanticErrors.add(new AssignmentExpectedError(expression.line));
                 }
 
-
-                SymbolTableStorage.popSymbolTableStack();
 
 
             } else if (ctx.getChild(i) instanceof JovaParser.If_stmtContext) {
@@ -95,7 +93,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
             }
         }
 
-        SymbolTableStorage.pushSymbolTableStack(methodSymboltable);
 
         return block;
     }
@@ -110,7 +107,27 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 }
             }
         }
+    }
 
+    private boolean checkIfMethod(IdExpression idexpr)  {
+
+        Symbol symbol;
+
+        if (method_symbol_table.getSymbolTable().containsKey(idexpr.Id)){
+            symbol = method_symbol_table.getSymbolTable().get(idexpr.Id);
+            
+            if(symbol != null) {
+                return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
+            }
+        }
+
+        if (method_symbol_table.getParent().getBaseClass() != null && method_symbol_table.getParent().getBaseClass().getSymbolTable().containsKey(idexpr.Id)) {
+            symbol = method_symbol_table.getParent().getBaseClass().getSymbolTable().get(idexpr.Id);
+
+            return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
+        }
+
+        return false;
     }
 
 }

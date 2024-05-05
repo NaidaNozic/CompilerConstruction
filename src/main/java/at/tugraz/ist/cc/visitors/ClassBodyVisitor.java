@@ -27,52 +27,64 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         DeclarationVisitor declarationVisitor = new DeclarationVisitor(semanticErrors);
         MethodVisitor methodVisitor = new MethodVisitor(semanticErrors);
 
-        SymbolTable classSymbolTable = SymbolTableStorage.popSymbolTableStack();
+        String class_scope_id = SymbolTableStorage.popScopeID();
+        SymbolTable class_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(class_scope_id);
 
         if (SymbolTableStorage.getMode()) {
             for (int i=0; i<ctx.getChildCount(); i++){
                 if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
                     Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
-                    classSymbolTable.updateSymbolTable(declaration);
+                    class_symbol_table.updateSymbolTable(declaration);
 
                 }
                 else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
 
                     //-------------- only to collect all methods for the symbol table -------------
 
-                    classSymbolTable.updateSymbolTable(methodVisitor.visit(ctx.getChild(i)));
+                    Method method = methodVisitor.visit(ctx.getChild(i));
+                    new SymbolTable(method.param.id, class_symbol_table);
+
+                    class_symbol_table.updateSymbolTable(method);
                     //------------------------------------------------------------------------------
                 }
             }
 
             return classBody;
         }
+        else {
+            for (int i=0; i<ctx.getChildCount(); i++){
+                if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
+                    Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
+                    checkConflicts(declaration, classBody.declarations);
+                    classBody.declarations.add(declaration);
+
+                }
+                else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+                    if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+                        SymbolTable methodSymbolTable = class_symbol_table.getChild(ctx.getChild(i).getChild(0).getChild(1).getText()); //TODO find right table
+
+                        methodSymbolTable.copyClassSymbolTable(class_symbol_table);
+
+                        SymbolTableStorage.addSymbolTableToStorage(methodSymbolTable);
+
+                        SymbolTableStorage.pushScopeID(class_scope_id);
+                        SymbolTableStorage.pushScopeID(methodSymbolTable.getScopeId());
 
 
-        for (int i=0; i<ctx.getChildCount(); i++){
-            if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
-                Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
-                checkConflicts(declaration, classBody.declarations);
-                classBody.declarations.add(declaration);
+                        Method method = methodVisitor.visit(ctx.getChild(i));
+                        checkBuiltInFunctions(method);
+                        checkMethodConflicts(method, classBody.methods);
+                        classBody.methods.add(method);
 
-                classSymbolTable.updateSymbolTable(declaration);
-
-            }
-            else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
-                if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
-                    SymbolTable methodSymbolTable = new SymbolTable((((JovaParser.MethodContext) ctx.getChild(i)).param()).ID().getText(),
-                            classSymbolTable);
-                    
-                    SymbolTableStorage.pushSymbolTableStack(methodSymbolTable);
-
-
-                    Method method = methodVisitor.visit(ctx.getChild(i));
-                    checkBuiltInFunctions(method);
-                    checkMethodConflicts(method, classBody.methods);
-                    classBody.methods.add(method);
+                        SymbolTableStorage.popScopeID();
+                        SymbolTableStorage.popScopeID();
+                    }
                 }
             }
         }
+
+
+
 
         return classBody;
     }
