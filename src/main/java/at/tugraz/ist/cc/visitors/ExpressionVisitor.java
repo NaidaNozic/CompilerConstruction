@@ -110,43 +110,15 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression right = visit(ctx.getChild(2));
         String operator = ctx.getChild(1).getText();
 
-        String comp_left;
-        String comp_right;
-
-
-        switch (left) {
-            case BooleanLiteral booleanLiteral -> comp_left = booleanLiteral.type;
-            case IntegerLiteral integerLiteral -> comp_left = integerLiteral.type;
-            case StringLiteral stringLiteral -> comp_left = stringLiteral.type;
-            case OperatorExpression operatorExpression -> comp_left = operatorExpression.type;
-            case AddNotExpression addNot -> comp_left = addNot.type;
-            case ParanthesisExpression par -> comp_left = par.type;
-            case IdExpression idExpression -> comp_left = idExpression.type;
-            //TODO add additional cases if needed (dot-operator,...)
-            default -> {
-                return new OperatorExpression(left, operator, right, "invalid");
-            }
-        }
-
-        switch (right) {
-            case BooleanLiteral booleanLiteral -> comp_right = booleanLiteral.type;
-            case IntegerLiteral integerLiteral -> comp_right = integerLiteral.type;
-            case StringLiteral stringLiteral -> comp_right = stringLiteral.type;
-            case OperatorExpression operatorExpression -> comp_right = operatorExpression.type;
-            case AddNotExpression addNot -> comp_right = addNot.type;
-            case ParanthesisExpression par -> comp_right = par.type;
-            case IdExpression idExpression -> comp_right = idExpression.type;
-            //TODO add additional cases if needed (dot-operator,...)
-            default -> {
-                return new OperatorExpression(left, operator, right, "invalid");
-            }
-        }
+        String comp_left = left.type;
+        String comp_right = right.type;
 
 
         boolean int_operands = Objects.equals(comp_left, "int") && Objects.equals(comp_right, "int");
         boolean bool_operands = Objects.equals(comp_left, "bool") && Objects.equals(comp_right, "bool");
 
-        if (Objects.equals(operator, "+") || Objects.equals(operator, "-") || Objects.equals(operator, "*") || Objects.equals(operator, "/") || Objects.equals(operator, "%")) {
+        if (Objects.equals(operator, "+") || Objects.equals(operator, "-") ||
+            Objects.equals(operator, "*") || Objects.equals(operator, "/") || Objects.equals(operator, "%")) {
             if (int_operands) {
                 return new OperatorExpression(left, operator, right, "int");
             } else {

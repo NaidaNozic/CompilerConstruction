@@ -8,7 +8,7 @@ Derived : Base {
 
     int meth(int a) {
         bool b;
-        hi(!"b");
+        hi(+1 - 1, a);
     }
 }
 
