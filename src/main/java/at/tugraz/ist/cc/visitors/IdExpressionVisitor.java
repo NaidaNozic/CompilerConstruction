@@ -41,7 +41,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         if (idExpression.childCount == 1) { //that's a variable
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
-            if (symbol != null && (symbol.getSymbolType() == Symbol.SymbolType.VARIABLE ||  symbol.getSymbolType() == Symbol.SymbolType.PARAMETER)) {
+            if (symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD)) {
                 idExpression.type = symbol.getType().type;
             } else {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));

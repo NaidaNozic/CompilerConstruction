@@ -1,15 +1,32 @@
 Base {
- int hi(int b) {}
+ int hi(Base b) {}
 }
 
+NotParent{}
 
 Derived : Base {
 
 
     int meth(int a) {
-        bool b;
-        hi(+1 - 1, a);
+        Base b;
+        Derived c;
+        NotParent np;
+
+        np = new NotParent; //?????? idUnknownError for NotParent ????
+        b = new Base;
+        c = new Derived;
+        hi(np);
     }
+
+    int me(int a) {
+            Base b;
+
+            b = new Base;
+            hi(!b + 1);
+        }
 }
+
+//shadowing this to handle in dot operator???
+//integer boundaries skipped
 
 
