@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Symbol {
     public enum SymbolType {
-        CLASS, VARIABLE, METHOD, PARAMETER, BUILT_IN
+        VARIABLE, METHOD, PARAMETER
     }
 
     private String id;

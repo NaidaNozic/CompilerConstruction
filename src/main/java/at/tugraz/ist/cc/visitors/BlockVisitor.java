@@ -14,9 +14,10 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
     private ParamList methodParams;
     public List<SemanticError> semanticErrors;
-    SymbolTable method_symbol_table;
+    public BlockVisitor(List<SemanticError> semanticErrors){
+        this.semanticErrors = semanticErrors;
+    }
     public BlockVisitor(List<SemanticError> semanticErrors, ParamList methodParams_){
-
         this.semanticErrors = semanticErrors;
         methodParams = methodParams_;
     }
@@ -29,8 +30,8 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         ReturnStatementVisitor returnStatementVisitor = new ReturnStatementVisitor(semanticErrors);
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
 
-        String method_scope_id = SymbolTableStorage.getMethodScopeIDFromStack();
-        method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
+        String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
+        SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
 
         for(int i=0; i<ctx.getChildCount(); i++){
             if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
@@ -63,28 +64,28 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 block.expressions.add(expression);
 
                 if (expression instanceof OperatorExpression &&
-                    !(((OperatorExpression) expression).operator).equals("=")){
+                        !(((OperatorExpression) expression).operator).equals("=")){
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 } else if (expression instanceof IntegerLiteral ||
-                           expression instanceof BooleanLiteral ||
-                           expression instanceof StringLiteral) {
+                        expression instanceof BooleanLiteral ||
+                        expression instanceof StringLiteral) {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
-                } else if (expression instanceof IdExpression && checkIfMethod((IdExpression) expression)) {
+                } else if (expression instanceof IdExpression && isNoMethod((IdExpression) expression, method_symbol_table)) {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 }
 
 
 
             } else if (ctx.getChild(i) instanceof JovaParser.If_stmtContext) {
-                
+
                 IfStatement ifStatement = ifStatementVisitor.visit((ctx.getChild(i)));
                 block.ifStatements.add(ifStatement);
-                
+
             } else if (ctx.getChild(i) instanceof JovaParser.While_stmtContext) {
-                
+
                 WhileStatement whileStatement = whileStatementVisitor.visit(ctx.getChild(i));
                 block.whileStatements.add(whileStatement);
-                
+
             } else if (ctx.getChild(i) instanceof  JovaParser.Return_stmtContext) {
 
                 ReturnStatement returnStatement = returnStatementVisitor.visit(ctx.getChild(i));
@@ -92,8 +93,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
             }
         }
-
-
         return block;
     }
     private void checkConflicts(Declaration declaration, List<Declaration> declarations) {
@@ -109,22 +108,23 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         }
     }
 
-    private boolean checkIfMethod(IdExpression idexpr)  {
-
+    private boolean isNoMethod(IdExpression idExpression, SymbolTable mst)  {
         Symbol symbol;
 
-        if (method_symbol_table.getSymbolTable().containsKey(idexpr.Id)){
-            symbol = method_symbol_table.getSymbolTable().get(idexpr.Id);
-            
-            if(symbol != null) {
-                return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
-            }
-        }
-
-        if (method_symbol_table.getParent().getBaseClass() != null && method_symbol_table.getParent().getBaseClass().getSymbolTable().containsKey(idexpr.Id)) {
-            symbol = method_symbol_table.getParent().getBaseClass().getSymbolTable().get(idexpr.Id);
-
+        if (mst.getSymbolTable().containsKey(idExpression.Id)){
+            symbol = mst.getSymbolTable().get(idExpression.Id);
             return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
+        } else {
+            SymbolTable st_helper = mst.getParent().getBaseClass();
+
+            while (st_helper != null) {
+                if (st_helper.getSymbolTable().containsKey(idExpression.Id)) {
+                    symbol = st_helper.getSymbolTable().get(idExpression.Id);
+                    return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
+                } else {
+                    st_helper = st_helper.getBaseClass();
+                }
+            }
         }
 
         return false;

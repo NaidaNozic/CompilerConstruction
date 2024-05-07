@@ -20,7 +20,7 @@ public class WhileStatementVisitor extends JovaBaseVisitor<WhileStatement> {
     public WhileStatement visitWhile_stmt(JovaParser.While_stmtContext ctx) {
 
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
-        BlockVisitor blockVisitor = new BlockVisitor(semanticErrors, null);
+        BlockVisitor blockVisitor = new BlockVisitor(semanticErrors);
         Expression expression = expressionVisitor.visit(ctx.getChild(2));
         int line = ((TerminalNodeImpl)ctx.getChild(0)).getSymbol().getLine();
 

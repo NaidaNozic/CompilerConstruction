@@ -11,22 +11,17 @@ import java.util.*;
 public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
     public List<SemanticError> semanticErrors;
-    public static ArrayList<SemanticError> reportErrorLater = new ArrayList<>();
-    public static int layer = -1;
     public IdExpressionVisitor(List<SemanticError> semanticErrors) {
         this.semanticErrors = semanticErrors;
     }
     @Override
     public IdExpression visitId_expr(JovaParser.Id_exprContext ctx) {
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
-        ArrayList<String> method_param_types = new ArrayList<>();
 
-        String method_scope_id = SymbolTableStorage.getMethodScopeIDFromStack();
+        String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
         SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
 
         IdExpression idExpression = new IdExpression(ctx.getChild(0).getText(), ctx.ID().getSymbol().getLine(), ctx.getChildCount());
-
-        layer++;
 
 
         for (int i = 2; i < ctx.getChildCount(); i += 2) {
@@ -37,88 +32,65 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             }
         }
 
-        if(layer == 0){
-            iterateExpressions(idExpression, method_symbol_table);
-        }
-
-        layer--;
-
-
-
-        System.out.println("break");
-
+        checkExpression(idExpression, method_symbol_table);
 
         return idExpression;
     }
 
-    private String iterateExpressions(Expression e, SymbolTable mst) {
-        if(e instanceof BooleanLiteral) {
-            return "bool";
-        } else if(e instanceof IntegerLiteral) {
-            return "int";
-        } else if(e instanceof StringLiteral) {
-            return "string";
-        } else if (e instanceof IdExpression) {
-            return iterateExpressions((IdExpression)e, mst);
-        } else if(e instanceof OperatorExpression) {
-            iterateExpressions(((OperatorExpression) e).rightExpression, mst); //control of right part
-            return iterateExpressions(((OperatorExpression) e).leftExpression, mst);
-        }
-        return null;
-    }
-
-    private String iterateExpressions(IdExpression idExpression, SymbolTable mst) {
-        ArrayList<String> arg_types = new ArrayList<>();
-
-        if (idExpression.childCount == 1) {
+    private void checkExpression(IdExpression idExpression, SymbolTable mst) {
+        if (idExpression.childCount == 1) { //that's a variable
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
-            if (symbol != null){
-                return symbol.getType().type;
+            if (symbol != null && (symbol.getSymbolType() == Symbol.SymbolType.VARIABLE ||  symbol.getSymbolType() == Symbol.SymbolType.PARAMETER)) {
+                idExpression.type = symbol.getType().type;
             } else {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));
+                idExpression.type = "invalid";
+            }
+        } else { //that's a method
+            ArrayList<String> arg_types = new ArrayList<>();
+            Symbol symbol = searchInSymbolTable(idExpression, mst);
+
+            if (checkForBuiltIn(idExpression)) {
+                idExpression.type = "int";
+                return;
+            } else if (checkForReadLine(idExpression)) {
+                idExpression.type = "string";
+                return;
             }
 
-        } else {
-            for (Expression e : idExpression.expressions) {
-                if(e instanceof BooleanLiteral) {
-                    arg_types.add("bool");
-                } else if(e instanceof IntegerLiteral) {
-                    arg_types.add("int");
-                } else if(e instanceof StringLiteral) {
-                    arg_types.add("string");
-                } else if (e instanceof IdExpression) {
-                    arg_types.add(iterateExpressions((IdExpression) e, mst));
-                } else if(e instanceof OperatorExpression) {
-                    arg_types.add(iterateExpressions(((OperatorExpression) e).leftExpression, mst));
-                    iterateExpressions(((OperatorExpression) e).rightExpression, mst); //control of right part
+            for (Expression id : idExpression.expressions) {
+                if (Objects.equals(id.type, "invalid")) {
+                    idExpression.type = "invalid";
+                    return;
+                } else {
+                    arg_types.add((id.type));
                 }
             }
 
-            Symbol method_symbol = searchInSymbolTable(idExpression, mst);
-
-            if (method_symbol != null && !arg_types.contains(null)) {
-                if (method_symbol.getParamSymbols().size() == arg_types.size()) {
-                    ArrayList<Symbol> param_symbols = method_symbol.getParamSymbols();
+            if (symbol != null && symbol.getSymbolType() == Symbol.SymbolType.METHOD) {
+                if (symbol.getParamSymbols().size() == arg_types.size()) {
+                    ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
 
                     for (int i = 0; i < param_symbols.size(); i++){
                         if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i))) {
                             semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
-                            return null;
+                            idExpression.type = "invalid";
+                            return;
                         }
                     }
 
-                    return method_symbol.getType().type;
+                    idExpression.type = symbol.getType().type;
+
                 } else {
                     semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
+                    idExpression.type = "invalid";
                 }
+            } else {
+                semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
+                idExpression.type = "invalid";
             }
-
-
-
-
         }
-        return null;
     }
 
     private Symbol searchInSymbolTable(IdExpression idExpression, SymbolTable mst) {
@@ -138,62 +110,18 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         return null;
     }
 
+    private boolean checkForBuiltIn(IdExpression idExpression) {
+        if (Objects.equals(idExpression.Id, "print") && idExpression.expressions.size() == 1) {
+            return Objects.equals(idExpression.expressions.getFirst().type, "int") ||
+                    Objects.equals(idExpression.expressions.getFirst().type, "bool") ||
+                    Objects.equals(idExpression.expressions.getFirst().type, "string");
+        } else {
+            return Objects.equals(idExpression.Id, "readInt") && idExpression.expressions.isEmpty();
+        }
+    }
 
-//    private boolean checkCurrentClass(IdExpression idExpression, SymbolTable method_symbol_table, ArrayList<String> method_param_types) {
-//        Symbol method_symbol;
-//
-//        if(method_symbol_table.getSymbolTable().containsKey(idExpression.Id)){
-//            method_symbol = method_symbol_table.getSymbolTable().get(idExpression.Id);
-//
-//            if(method_symbol.getSymbolType() == Symbol.SymbolType.METHOD &&
-//                    method_symbol.getParamSymbols().size() == method_param_types.size() &&
-//                    reportErrorLater.isEmpty()){
-//
-//                ArrayList<Symbol> param_symbols = method_symbol.getParamSymbols();
-//
-//                for (int i = 0; i < method_param_types.size(); i++) {
-//
-//                    if(!Objects.equals(method_param_types.get(i), param_symbols.get(i).getType().type)) {
-//                        return false;
-//                    }
-//                }
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
-//
-//    private boolean checkBaseClass(IdExpression idExpression, SymbolTable method_symbol_table, ArrayList<String> method_param_types){
-//        SymbolTable base_class_table;
-//        Symbol base_class_method;
-//
-//        if(method_symbol_table.getParent().getBaseClass() != null) {
-//            base_class_table = SymbolTableStorage.getSymbolTableFromStorage(method_symbol_table.getParent().getBaseClass().getScopeId());
-//
-//            if(base_class_table.getSymbolTable().containsKey(idExpression.Id)){
-//                base_class_method = base_class_table.getSymbolTable().get(idExpression.Id);
-//
-//                if(base_class_method.getSymbolType() == Symbol.SymbolType.METHOD &&
-//                        base_class_method.getParamSymbols().size() == method_param_types.size() &&
-//                        reportErrorLater.isEmpty()){
-//
-//                    ArrayList<Symbol> param_symbols = base_class_method.getParamSymbols();
-//
-//                    for (int i = 0; i < method_param_types.size(); i++) {
-//
-//                        if(!Objects.equals(method_param_types.get(i), param_symbols.get(i).getType().type)) {
-//                            return false;
-//                        }
-//                    }
-//                    return true;
-//                }
-//            }
-//        }
-//
-//        return false;
-//    }
+    private boolean checkForReadLine(IdExpression idExpression) {
+        return Objects.equals(idExpression.Id, "readLine") && idExpression.expressions.isEmpty();
 
-
-
+    }
 }

@@ -15,7 +15,7 @@ public class SymbolTable {
 
     private SymbolTable baseClass;
 
-    //symboltable for classes
+    //symbol table for classes
     public SymbolTable(String scope_id) {
         scopeId = scope_id;
         symbolTable = new HashMap<>();
@@ -24,7 +24,7 @@ public class SymbolTable {
     }
 
 
-    //symboltable for methods
+    //symbol table for methods
     public SymbolTable(String scope_id, SymbolTable parent_){
         scopeId = scope_id;
         symbolTable = new HashMap<>();
@@ -37,8 +37,8 @@ public class SymbolTable {
         parent.children.add(this);
     }
 
-    public void copyClassSymbolTable(SymbolTable classtable) {
-        symbolTable.putAll(classtable.symbolTable);
+    public void copyClassSymbolTable(SymbolTable class_table) {
+        symbolTable.putAll(class_table.symbolTable);
     }
 
     public void addBaseClass(SymbolTable base_class) {

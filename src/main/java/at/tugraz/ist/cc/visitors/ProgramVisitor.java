@@ -2,7 +2,6 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.SymbolTable;
 import at.tugraz.ist.cc.SymbolTableStorage;
 import at.tugraz.ist.cc.error.semantic.CyclicInheritanceError;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
@@ -158,13 +157,13 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         } else if (expression instanceof OperatorExpression) {
             if (((OperatorExpression) expression).leftExpression instanceof NewClassExpression) {
                 checkUndefinedClassId(((NewClassExpression) ((OperatorExpression) expression).leftExpression).classId,
-                                       expression.line);
+                        expression.line);
             } else {
                 validateExpression(((OperatorExpression) expression).leftExpression);
             }
             if (((OperatorExpression) expression).rightExpression instanceof NewClassExpression) {
                 checkUndefinedClassId(((NewClassExpression) ((OperatorExpression) expression).rightExpression).classId,
-                                       expression.line);
+                        expression.line);
             } else {
                 validateExpression(((OperatorExpression) expression).rightExpression);
             }

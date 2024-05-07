@@ -6,9 +6,9 @@ Base {
 Derived : Base {
 
 
-
     int meth(int a) {
-        hi(me(1));
+        bool b;
+        hi(!"b");
     }
 }
 

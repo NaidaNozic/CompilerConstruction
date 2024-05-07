@@ -8,15 +8,12 @@ import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
-import org.antlr.v4.codegen.model.decl.Decl;
 
 import java.util.*;
 
 public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
 
     public List<SemanticError> semanticErrors;
-
-    private Set<String> declarationNames = new HashSet<>();
 
     public ClassBodyVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
@@ -61,7 +58,7 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
                 }
                 else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
                     if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
-                        SymbolTable methodSymbolTable = class_symbol_table.getChild(ctx.getChild(i).getChild(0).getChild(1).getText()); //TODO find right table
+                        SymbolTable methodSymbolTable = class_symbol_table.getChild(ctx.getChild(i).getChild(0).getChild(1).getText());
 
                         methodSymbolTable.copyClassSymbolTable(class_symbol_table);
 
@@ -141,7 +138,7 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         else if((Objects.equals(method.param.id, "readInt") || Objects.equals(method.param.id, "readLine")) &&
                 method.paramList.params.isEmpty()){
 
-                semanticErrors.add(new MethodDoubleDefError(method.param.id, new ArrayList<>(), method.param.line));
+            semanticErrors.add(new MethodDoubleDefError(method.param.id, new ArrayList<>(), method.param.line));
         }
     }
 

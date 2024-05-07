@@ -7,5 +7,6 @@ public class StringLiteral extends LiteralExpression {
     public StringLiteral(Integer line, String stringType) {
         super(line);
         this.stringType = stringType;
+        this.type = "string";
     }
 }

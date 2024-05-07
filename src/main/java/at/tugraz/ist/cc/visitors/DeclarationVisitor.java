@@ -4,9 +4,7 @@ import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.Declaration;
-import at.tugraz.ist.cc.program.Expression;
 import at.tugraz.ist.cc.program.Param;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.List;
 

@@ -21,8 +21,8 @@ public class IfStatementVisitor extends JovaBaseVisitor<IfStatement> {
     public IfStatement visitIf_stmt(JovaParser.If_stmtContext ctx) {
 
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
-        BlockVisitor thenBlockVisitor = new BlockVisitor(semanticErrors, null);
-        BlockVisitor elseBlockVisitor = new BlockVisitor(semanticErrors, null);
+        BlockVisitor thenBlockVisitor = new BlockVisitor(semanticErrors);
+        BlockVisitor elseBlockVisitor = new BlockVisitor(semanticErrors);
 
         Expression expression = expressionVisitor.visit(ctx.getChild(2));
         int line = ((TerminalNodeImpl)ctx.getChild(0)).getSymbol().getLine();

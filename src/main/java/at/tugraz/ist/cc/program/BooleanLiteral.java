@@ -6,5 +6,6 @@ public class BooleanLiteral extends LiteralExpression {
     public BooleanLiteral(Integer line, boolean booleanType) {
         super(line);
         this.booleanType = booleanType;
+        this.type = "bool";
     }
 }

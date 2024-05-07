@@ -1,9 +1,6 @@
 package at.tugraz.ist.cc.visitors;
 
-import at.tugraz.ist.cc.JovaBaseVisitor;
-import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.SymbolTable;
-import at.tugraz.ist.cc.SymbolTableStorage;
+import at.tugraz.ist.cc.*;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
 
@@ -37,17 +34,12 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
             return null;
         } else {
             if(Objects.equals(ctx.getChild(1).getText(), "{")) {
-                SymbolTable class_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(id);
                 SymbolTableStorage.pushScopeID(id);
-
 
                 ClassBody classBody = classBodyVisitor.visit(ctx.getChild(2));
                 List<String> methods = null; //getMethods(classBody);
                 List<String> declarations = null; //getDeclarations(classBody);
                 classDeclaration = new ClassDeclaration(id, classBody, line);
-
-
-                return classDeclaration;
             } else {
                 String superclass = ctx.getChild(2).getText();
 
@@ -60,14 +52,9 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
                 List<String> methods = null; // getMethods(classBody);
                 List<String> declarations = null; // getDeclarations(classBody);
                 classDeclaration = new ClassDeclaration(id, superclass, classBody, line);
-
-
-                return classDeclaration;
             }
+            return classDeclaration;
         }
-
-
-
     }
 }
 

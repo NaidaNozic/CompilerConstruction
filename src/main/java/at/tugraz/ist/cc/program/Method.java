@@ -1,7 +1,5 @@
 package at.tugraz.ist.cc.program;
 
-import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.visitors.TypeVisitor;
 
 public class Method {
     public Block block;

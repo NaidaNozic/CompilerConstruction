@@ -23,7 +23,6 @@ public class ReturnStatementVisitor extends JovaBaseVisitor<ReturnStatement> {
         Expression expression = expressionVisitor.visit(ctx.getChild(1));
         int line = ((TerminalNodeImpl)ctx.getChild(0)).getSymbol().getLine();
 
-        ReturnStatement returnStatement = new ReturnStatement(expression, line);
-        return returnStatement;
+        return new ReturnStatement(expression, line);
     }
 }

@@ -5,13 +5,11 @@ import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.SymbolTable;
 import at.tugraz.ist.cc.SymbolTableStorage;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
-import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.Block;
 import at.tugraz.ist.cc.program.Method;
 import at.tugraz.ist.cc.program.Param;
 import at.tugraz.ist.cc.program.ParamList;
-import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +17,9 @@ import java.util.List;
 public class MethodVisitor extends JovaBaseVisitor<Method> {
 
     public List<SemanticError> semanticErrors;
-    public List<String> methodSignatures;
 
     public MethodVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
-        this.methodSignatures = new ArrayList<>();
     }
     @Override
     public Method visitMethod(JovaParser.MethodContext ctx) {
@@ -48,7 +44,7 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
             return new Method(null, param_list, paramVisitor.visit(ctx.getChild(0)));
         }
         else {
-            String method_scope_id = SymbolTableStorage.getMethodScopeIDFromStack();
+            String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
             SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
 
             for(int children = 0; children < ctx.getChildCount(); children++)

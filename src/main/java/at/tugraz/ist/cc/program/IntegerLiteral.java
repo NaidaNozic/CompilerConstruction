@@ -5,5 +5,6 @@ public class IntegerLiteral extends LiteralExpression {
     public IntegerLiteral(Integer line, Integer integerType) {
         super(line);
         this.integerType = integerType;
+        this.type = "int";
     }
 }
