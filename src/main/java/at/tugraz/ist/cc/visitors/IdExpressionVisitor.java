@@ -81,15 +81,12 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     }
 
                     idExpression.type = symbol.getType().type;
-
-                } else {
-                    semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
-                    idExpression.type = "invalid";
+                    return;
                 }
-            } else {
-                semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
-                idExpression.type = "invalid";
             }
+
+            semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
+            idExpression.type = "invalid";
         }
     }
 
