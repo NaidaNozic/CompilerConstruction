@@ -4,6 +4,7 @@ public class NewClassExpression extends Expression{
     public NewClassExpression(Integer line, String classId) {
         super(line);
         this.classId = classId;
+        this.type = classId;
     }
 }
 

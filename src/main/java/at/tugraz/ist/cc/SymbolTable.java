@@ -20,7 +20,7 @@ public class SymbolTable {
         scopeId = scope_id;
         symbolTable = new HashMap<>();
         children = new ArrayList<>();
-
+        updateSymbolTable(scope_id); //put itself in symbol table
     }
 
 
@@ -80,6 +80,10 @@ public class SymbolTable {
 
     public void updateSymbolTable(Method method) {
         symbolTable.put(method.param.id, new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
+    }
+
+    public void updateSymbolTable(String self) {
+        symbolTable.put(self, new Symbol(self, new ClassType(self), Symbol.SymbolType.CLASS));
     }
     //-------------------------------------------------------------------------------------------------------------
 

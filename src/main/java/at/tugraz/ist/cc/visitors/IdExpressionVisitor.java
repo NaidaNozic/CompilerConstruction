@@ -11,9 +11,11 @@ import java.util.*;
 public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
     public List<SemanticError> semanticErrors;
+
     public IdExpressionVisitor(List<SemanticError> semanticErrors) {
         this.semanticErrors = semanticErrors;
     }
+
     @Override
     public IdExpression visitId_expr(JovaParser.Id_exprContext ctx) {
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
@@ -42,6 +44,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
             if (symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD)) {
+                ExpressionVisitor.leafCounter++;
                 idExpression.type = symbol.getType().type;
             } else {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));
@@ -51,13 +54,21 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             ArrayList<String> arg_types = new ArrayList<>();
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
-            if (checkForBuiltIn(idExpression)) {
+            if (checkForPrint(idExpression)) {
+                ExpressionVisitor.leafCounter--;
+                idExpression.type = "int";
+                return;
+            } else  if (checkForReadInt(idExpression)) {
+                ExpressionVisitor.leafCounter++;
                 idExpression.type = "int";
                 return;
             } else if (checkForReadLine(idExpression)) {
+                ExpressionVisitor.leafCounter++;
                 idExpression.type = "string";
                 return;
             }
+
+            ExpressionVisitor.leafCounter++;
 
             for (Expression id : idExpression.expressions) {
                 if (Objects.equals(id.type, "invalid")) {
@@ -72,7 +83,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                 if (symbol.getParamSymbols().size() == arg_types.size()) {
                     ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
 
-                    for (int i = 0; i < param_symbols.size(); i++){
+                    for (int i = 0; i < param_symbols.size(); i++) {
                         if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i))) {
                             semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
                             idExpression.type = "invalid";
@@ -107,18 +118,18 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         return null;
     }
 
-    private boolean checkForBuiltIn(IdExpression idExpression) {
-        if (Objects.equals(idExpression.Id, "print") && idExpression.expressions.size() == 1) {
-            return Objects.equals(idExpression.expressions.getFirst().type, "int") ||
-                    Objects.equals(idExpression.expressions.getFirst().type, "bool") ||
-                    Objects.equals(idExpression.expressions.getFirst().type, "string");
-        } else {
-            return Objects.equals(idExpression.Id, "readInt") && idExpression.expressions.isEmpty();
-        }
+    private boolean checkForPrint(IdExpression idExpression) {
+        return (Objects.equals(idExpression.Id, "print") && idExpression.expressions.size() == 1) &&
+                (Objects.equals(idExpression.expressions.getFirst().type, "int") ||
+                Objects.equals(idExpression.expressions.getFirst().type, "bool") ||
+                Objects.equals(idExpression.expressions.getFirst().type, "string"));
+    }
+
+    private boolean checkForReadInt(IdExpression idExpression) {
+        return Objects.equals(idExpression.Id, "readInt") && idExpression.expressions.isEmpty();
     }
 
     private boolean checkForReadLine(IdExpression idExpression) {
         return Objects.equals(idExpression.Id, "readLine") && idExpression.expressions.isEmpty();
-
     }
 }

@@ -5,11 +5,13 @@ import at.tugraz.ist.cc.error.semantic.OperatorTypeError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
-
+    public static int leafCounter = 0; // lawe
+    public static ArrayList<String> allOperators = new ArrayList<>();
     public List<SemanticError> semanticErrors;
     public ExpressionVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
@@ -44,6 +46,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitLiteralExpression(JovaParser.LiteralExpressionContext ctx) {
+        leafCounter++;
         LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
         return literalExpressionVisitor.visit(ctx.getChild(0));
     }
@@ -113,18 +116,28 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         String comp_left = left.type;
         String comp_right = right.type;
 
+        if (ctx.parent instanceof JovaParser.BlockContext && Objects.equals(operator, "+") &&
+            !(Objects.equals(left.type, "invalid") || Objects.equals(right.type, "invalid"))) {
+            if (leafCounter == 0 && allOperators.stream().allMatch("+"::equals)) {
+                BlockVisitor.validExpression = true;
+                return new OperatorExpression(left, operator, right, "int");
+            }
+        }
+
 
         boolean int_operands = Objects.equals(comp_left, "int") && Objects.equals(comp_right, "int");
         boolean bool_operands = Objects.equals(comp_left, "bool") && Objects.equals(comp_right, "bool");
 
         if (Objects.equals(operator, "+") || Objects.equals(operator, "-") ||
             Objects.equals(operator, "*") || Objects.equals(operator, "/") || Objects.equals(operator, "%")) {
+            allOperators.add(operator);
             if (int_operands) {
                 return new OperatorExpression(left, operator, right, "int");
             } else {
                 semanticErrors.add(new OperatorTypeError(operator, left.line));
             }
         } else if (Objects.equals(operator, ">") || Objects.equals(operator, "<")) {
+            allOperators.add(operator);
             if (int_operands) {
                 return new OperatorExpression(left, operator, right, "bool");
             } else {
