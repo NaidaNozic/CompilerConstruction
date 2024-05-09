@@ -59,12 +59,12 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
             } else if (ctx.getChild(i) instanceof JovaParser.ExprContext) {
 
-
                 Expression expression = expressionVisitor.visit(ctx.getChild(i));
                 block.expressions.add(expression);
 
                 if (expression instanceof OperatorExpression &&
-                        !(((OperatorExpression) expression).operator).equals("=")){
+                        !(((OperatorExpression) expression).operator).equals("=") &&
+                        !((OperatorExpression) expression).operator.equals(".")){
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 } else if (expression instanceof IntegerLiteral ||
                         expression instanceof BooleanLiteral ||
@@ -73,8 +73,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 } else if (expression instanceof IdExpression && isNoMethod((IdExpression) expression, method_symbol_table)) {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 }
-
-
 
             } else if (ctx.getChild(i) instanceof JovaParser.If_stmtContext) {
 

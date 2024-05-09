@@ -70,8 +70,6 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
                 }
             }
 
-
-
             BlockVisitor blockVisitor = new BlockVisitor(semanticErrors, param_list);
 
             Block block;

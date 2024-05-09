@@ -29,7 +29,6 @@ public class DeclarationVisitor extends JovaBaseVisitor<Declaration> {
                 }
             }
         }
-
         return declaration;
     }
 }

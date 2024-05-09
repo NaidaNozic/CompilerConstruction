@@ -12,7 +12,6 @@ public class Symbol {
     public enum SymbolType {
         CLASS, VARIABLE, METHOD, PARAMETER
     }
-
     private String id;
     private Type type;
     private SymbolType symbolType;

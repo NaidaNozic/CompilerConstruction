@@ -5,5 +5,6 @@ public class ThisLiteral extends LiteralExpression {
     public ThisLiteral(Integer line, String thisType) {
         super(line);
         this.thisType = thisType;
+        this.type = "this";
     }
 }

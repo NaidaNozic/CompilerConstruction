@@ -6,5 +6,6 @@ public class NixLiteral extends LiteralExpression {
     public NixLiteral(Integer line, String nixType) {
         super(line);
         this.nixType = nixType;
+        this.type = "nix";
     }
 }

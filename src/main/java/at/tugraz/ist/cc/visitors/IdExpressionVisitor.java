@@ -1,18 +1,27 @@
 package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.*;
-import at.tugraz.ist.cc.error.semantic.IDUnknownError;
-import at.tugraz.ist.cc.error.semantic.MethodUnknownError;
-import at.tugraz.ist.cc.error.semantic.SemanticError;
+import at.tugraz.ist.cc.error.semantic.*;
 import at.tugraz.ist.cc.program.*;
 
 import java.util.*;
 
+import static org.antlr.v4.analysis.LeftRecursiveRuleAnalyzer.ASSOC.right;
+
 public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
     public List<SemanticError> semanticErrors;
+    public Expression leftExprOfDotOperator = null;
+    public boolean invalidDotOperatorRightExpr = false;
     public IdExpressionVisitor(List<SemanticError> semanticErrors) {
         this.semanticErrors = semanticErrors;
+    }
+
+    public IdExpressionVisitor(List<SemanticError> semanticErrors, Expression leftExprOfDotOperator,
+                               boolean invalidDotOperatorRightExpr) {
+        this.semanticErrors = semanticErrors;
+        this.leftExprOfDotOperator = leftExprOfDotOperator;
+        this.invalidDotOperatorRightExpr = invalidDotOperatorRightExpr;
     }
     @Override
     public IdExpression visitId_expr(JovaParser.Id_exprContext ctx) {
@@ -32,11 +41,84 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             }
         }
 
-        checkExpression(idExpression, method_symbol_table);
-
+        if(leftExprOfDotOperator != null && !invalidDotOperatorRightExpr) {
+            checkExpressionWithDotOperator(idExpression, method_symbol_table);
+        } else if(invalidDotOperatorRightExpr) {
+            semanticErrors.add(new MemberExpectedError(idExpression.line));
+            idExpression.type = "invalid";
+        }else{
+            checkExpression(idExpression, method_symbol_table);
+        }
         return idExpression;
     }
 
+    private void checkExpressionWithDotOperator(IdExpression rightExpr, SymbolTable mst){
+
+        if (leftExprOfDotOperator instanceof IntegerLiteral || leftExprOfDotOperator instanceof BooleanLiteral ||
+                leftExprOfDotOperator instanceof StringLiteral || leftExprOfDotOperator instanceof NixLiteral) {
+            if (rightExpr.childCount == 1) {
+                semanticErrors.add(new FieldUnknownError(leftExprOfDotOperator.type, rightExpr.Id, rightExpr.line));
+            } else {
+                ArrayList<String> arg_types = getArgTypes(rightExpr.expressions);
+                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                        rightExpr.Id, arg_types, rightExpr.line));
+            }
+            rightExpr.type = "invalid";
+            return;
+        }
+
+        if(rightExpr.childCount == 1){
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
+            if(symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD) ){
+                rightExpr.type = symbol.getType().type;
+            }else{
+                semanticErrors.add(new FieldUnknownError(leftExprOfDotOperator.type, rightExpr.Id, rightExpr.line));
+                rightExpr.type = "invalid";
+            }
+        }else{
+            ArrayList<String> arg_types = getArgTypes(rightExpr.expressions);
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
+
+            if (checkForBuiltIn(rightExpr)) {
+                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                        rightExpr.Id, arg_types, rightExpr.line));
+                rightExpr.type = "int";
+                return;
+            } else if (checkForReadLine(rightExpr)) {
+                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                        rightExpr.Id, arg_types, rightExpr.line));
+                rightExpr.type = "string";
+                return;
+            }
+
+            for (Expression id : rightExpr.expressions) {
+                if (Objects.equals(id.type, "invalid")) {
+                    rightExpr.type = "invalid";
+                    return;
+                }
+            }
+
+            if (symbol != null && symbol.getSymbolType() == Symbol.SymbolType.METHOD) {
+                if (symbol.getParamSymbols().size() == arg_types.size()) {
+                    ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
+
+                    for (int i = 0; i < param_symbols.size(); i++) {
+                        if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i))) {
+                            semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                                    rightExpr.Id, arg_types, rightExpr.line));
+                            rightExpr.type = "invalid";
+                            return;
+                        }
+                    }
+                    rightExpr.type = symbol.getType().type;
+                    return;
+                }
+            }
+            semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                    rightExpr.Id, arg_types, rightExpr.line));
+            rightExpr.type = "invalid";
+        }
+    }
     private void checkExpression(IdExpression idExpression, SymbolTable mst) {
         if (idExpression.childCount == 1) { //that's a variable
             Symbol symbol = searchInSymbolTable(idExpression, mst);
@@ -67,12 +149,11 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     arg_types.add((id.type));
                 }
             }
-
             if (symbol != null && symbol.getSymbolType() == Symbol.SymbolType.METHOD) {
                 if (symbol.getParamSymbols().size() == arg_types.size()) {
                     ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
 
-                    for (int i = 0; i < param_symbols.size(); i++){
+                    for (int i = 0; i < param_symbols.size(); i++) {
                         if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i))) {
                             semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
                             idExpression.type = "invalid";
@@ -90,6 +171,38 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         }
     }
 
+    private ArrayList<String> getArgTypes(List<Expression> expressions) {
+        ArrayList<String> arg_types = new ArrayList<>();
+        for (Expression expr : expressions){
+            arg_types.add(expr.type);
+        }
+        return arg_types;
+    }
+
+    private Symbol searchInSymbolTableWithDotOperator(IdExpression rightExpr, SymbolTable mst)
+    {
+        SymbolTable classSymbolTable;
+        if(this.leftExprOfDotOperator instanceof ThisLiteral){
+            classSymbolTable = mst.getParent();
+        }else {
+            classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(leftExprOfDotOperator.type);
+        }
+        SymbolTable baseSymbolTable = classSymbolTable.getBaseClass();
+
+        HashMap<String, Symbol> st = classSymbolTable.getSymbolTable();
+        if(st.containsKey(rightExpr.Id)){
+            return st.get(rightExpr.Id);
+        }else{
+            while(baseSymbolTable != null){
+                if (baseSymbolTable.getSymbolTable().containsKey(rightExpr.Id)) {
+                    return baseSymbolTable.getSymbolTable().get(rightExpr.Id);
+                } else {
+                    baseSymbolTable = baseSymbolTable.getBaseClass();
+                }
+            }
+        }
+        return null;
+    }
     private Symbol searchInSymbolTable(IdExpression idExpression, SymbolTable mst) {
         SymbolTable st_helper = mst.getParent().getBaseClass();
 
