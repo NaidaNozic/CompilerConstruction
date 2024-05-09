@@ -56,7 +56,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             rightExpr.type = "invalid";
             return;
         }
-        System.out.println(leftExprOfDotOperator.type);
         if (leftExprOfDotOperator.type.equals("int") || leftExprOfDotOperator.type.equals("bool") ||
                 leftExprOfDotOperator.type.equals("string") || leftExprOfDotOperator.type.equals("nix")) {
             if (rightExpr.childCount == 1) {
@@ -88,8 +87,10 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "int";
                 return;
-            } else  if (checkForReadInt(rightExpr)) {
+            } else if (checkForReadInt(rightExpr)) {
                 ExpressionVisitor.leafCounter++;
+                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                        rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "int";
                 return;
             } else if (checkForReadLine(rightExpr)) {

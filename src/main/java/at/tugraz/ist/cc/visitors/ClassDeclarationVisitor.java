@@ -42,7 +42,6 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
                 classDeclaration = new ClassDeclaration(id, classBody, line);
             } else {
                 String superclass = ctx.getChild(2).getText();
-
                 SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
                 classSymbolTable.addBaseClass(SymbolTableStorage.getSymbolTableFromStorage(superclass));
                 SymbolTableStorage.pushScopeID(id);
