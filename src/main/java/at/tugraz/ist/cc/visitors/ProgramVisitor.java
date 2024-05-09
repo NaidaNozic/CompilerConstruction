@@ -101,6 +101,8 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
                 } while (sclassExists);
             }
         }
+
+        SymbolTableStorage.reset();
         return program;
     }
 
