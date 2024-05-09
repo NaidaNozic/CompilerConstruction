@@ -39,4 +39,10 @@ public class SymbolTableStorage {
     public static boolean getMode(){
         return collectClassBodyContent;
     }
+
+    public static void reset(){
+        symbolTableStorage.clear();
+        symbolTableStack.clear();
+        collectClassBodyContent = true;
+    }
 }

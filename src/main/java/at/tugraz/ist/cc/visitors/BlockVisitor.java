@@ -13,6 +13,7 @@ import java.util.Objects;
 public class BlockVisitor extends JovaBaseVisitor<Block> {
 
     private ParamList methodParams;
+    public static boolean validExpression = false;
     public List<SemanticError> semanticErrors;
     public BlockVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
@@ -43,7 +44,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 method_symbol_table.updateSymbolTable(declaration);
 
                 if(ctx.parent instanceof JovaParser.If_stmtContext ||
-                   ctx.parent instanceof JovaParser.While_stmtContext){
+                        ctx.parent instanceof JovaParser.While_stmtContext){
                     semanticErrors.add(new CannotDeclVarError(declaration.params.getFirst().line));
                 } else {
                     if (methodParams != null) {
@@ -59,12 +60,13 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
             } else if (ctx.getChild(i) instanceof JovaParser.ExprContext) {
 
+
                 Expression expression = expressionVisitor.visit(ctx.getChild(i));
                 block.expressions.add(expression);
 
                 if (expression instanceof OperatorExpression &&
-                        !(((OperatorExpression) expression).operator).equals("=") &&
-                        !((OperatorExpression) expression).operator.equals(".")){
+                        !(((OperatorExpression) expression).operator).equals("=") && !validExpression &&
+                        !(((OperatorExpression) expression).operator).equals(".")){
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 } else if (expression instanceof IntegerLiteral ||
                         expression instanceof BooleanLiteral ||
@@ -73,6 +75,12 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 } else if (expression instanceof IdExpression && isNoMethod((IdExpression) expression, method_symbol_table)) {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 }
+
+                ExpressionVisitor.leafCounter = 0;
+                ExpressionVisitor.allOperators.clear();
+                validExpression = false;
+
+
 
             } else if (ctx.getChild(i) instanceof JovaParser.If_stmtContext) {
 

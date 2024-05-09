@@ -24,6 +24,8 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
     public ProgramVisitor(List<SemanticError> semanticErrors, List<JovaWarning> jovaWarnings){
         this.semanticErrors = semanticErrors;
         this.jovaWarnings = jovaWarnings;
+        SymbolTableStorage.reset();
+        ExpressionVisitor.reset();
     }
     @Override
     public Program visitProgram(JovaParser.ProgramContext ctx) {

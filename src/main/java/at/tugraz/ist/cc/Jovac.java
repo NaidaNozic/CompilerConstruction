@@ -41,7 +41,6 @@ public class Jovac {
      *        A string representing the path to the input .jova file.
      */
     public void task1(String file_path) {
-        // TODO: Implement Task 1.
         CharStream input;
         try {
             input = CharStreams.fromFileName(file_path);
@@ -109,6 +108,23 @@ public class Jovac {
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+        JovaLexer lexer = new JovaLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        JovaParser parser = new JovaParser(tokens);
+
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+
+        lexer.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+        parser.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+
+        ParseTree parseTree = parser.program();
+
+        if (lexical_errors.size() +syntax_errors.size() == 0){
+            new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
+        }
+
+        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
     }
 
 

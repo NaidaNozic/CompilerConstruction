@@ -12,6 +12,9 @@ import java.util.Objects;
 public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     public List<SemanticError> semanticErrors;
+
+    public static int leafCounter = 0;
+    public static ArrayList<String> allOperators = new ArrayList<>();
     public Expression leftExprOfDotOperator = null;
     public boolean invalidDotOperatorRightExpr = false;
     public ExpressionVisitor(List<SemanticError> semanticErrors){
@@ -43,9 +46,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         this.leftExprOfDotOperator = null;
         this.invalidDotOperatorRightExpr = false;
 
-        return new OperatorExpression(left,
-                ctx.getChild(1).getText(),
-                right);
+        return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
     }
     @Override
     public Expression visitAddOperator(JovaParser.AddOperatorContext ctx) {
@@ -65,6 +66,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitLiteralExpression(JovaParser.LiteralExpressionContext ctx) {
+        leafCounter++;
         LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
@@ -155,20 +157,29 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
         String comp_left = left.type;
         String comp_right = right.type;
-
         if(this.invalidDotOperatorRightExpr)return new OperatorExpression(left, operator, right, "invalid");
+
+        if (ctx.parent instanceof JovaParser.BlockContext && Objects.equals(operator, "+") &&
+                !(Objects.equals(left.type, "invalid") || Objects.equals(right.type, "invalid"))) {
+            if (leafCounter == 0 && allOperators.stream().allMatch("+"::equals)) {
+                BlockVisitor.validExpression = true;
+                return new OperatorExpression(left, operator, right, "int");
+            }
+        }
 
         boolean int_operands = Objects.equals(comp_left, "int") && Objects.equals(comp_right, "int");
         boolean bool_operands = Objects.equals(comp_left, "bool") && Objects.equals(comp_right, "bool");
 
         if (Objects.equals(operator, "+") || Objects.equals(operator, "-") ||
-            Objects.equals(operator, "*") || Objects.equals(operator, "/") || Objects.equals(operator, "%")) {
+                Objects.equals(operator, "*") || Objects.equals(operator, "/") || Objects.equals(operator, "%")) {
+            allOperators.add(operator);
             if (int_operands) {
                 return new OperatorExpression(left, operator, right, "int");
             } else {
                 semanticErrors.add(new OperatorTypeError(operator, left.line));
             }
         } else if (Objects.equals(operator, ">") || Objects.equals(operator, "<")) {
+            allOperators.add(operator);
             if (int_operands) {
                 return new OperatorExpression(left, operator, right, "bool");
             } else {
@@ -184,4 +195,10 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
         return new OperatorExpression(left, operator, right, "invalid");
     }
+
+    public static void reset() {
+        leafCounter = 0;
+        allOperators.clear();
+    }
+
 }

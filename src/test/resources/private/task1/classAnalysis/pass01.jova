@@ -1,32 +1,16 @@
-Base {
- int hi(Base b) {}
+Tobi {
+    int tobi_meth(int a){}
 }
 
-NotParent{}
+Michi {
+    int michi_meth(int a){}
+}
 
-Derived : Base {
+Ju {
+    int me(int t){}
 
 
-    int meth(int a) {
-        Base b;
-        Derived c;
-        NotParent np;
-
-        np = new NotParent; //?????? idUnknownError for NotParent ????
-        b = new Base;
-        c = new Derived;
-        hi(np);
+    int ju_meth(int a){
+       hi(nix + 1);
     }
-
-    int me(int a) {
-            Base b;
-
-            b = new Base;
-            hi(!b + 1);
-        }
 }
-
-//shadowing this to handle in dot operator???
-//integer boundaries skipped
-
-
