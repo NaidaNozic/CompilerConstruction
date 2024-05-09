@@ -52,9 +52,13 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
     }
 
     private void checkExpressionWithDotOperator(IdExpression rightExpr, SymbolTable mst){
-
-        if (leftExprOfDotOperator instanceof IntegerLiteral || leftExprOfDotOperator instanceof BooleanLiteral ||
-                leftExprOfDotOperator instanceof StringLiteral || leftExprOfDotOperator instanceof NixLiteral) {
+        if(leftExprOfDotOperator.type.equals("invalid")){
+            rightExpr.type = "invalid";
+            return;
+        }
+        System.out.println(leftExprOfDotOperator.type);
+        if (leftExprOfDotOperator.type.equals("int") || leftExprOfDotOperator.type.equals("bool") ||
+                leftExprOfDotOperator.type.equals("string") || leftExprOfDotOperator.type.equals("nix")) {
             if (rightExpr.childCount == 1) {
                 semanticErrors.add(new FieldUnknownError(leftExprOfDotOperator.type, rightExpr.Id, rightExpr.line));
             } else {
