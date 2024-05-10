@@ -161,38 +161,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
         if (ctx.parent instanceof JovaParser.BlockContext && Objects.equals(operator, "+") &&
                 !(Objects.equals(left.type, "invalid") || Objects.equals(right.type, "invalid"))) {
-            if (allOperators.stream().allMatch("+"::equals)) {
-                Expression left_helper = left;
-                Expression right_helper = right;
-
-                if (left instanceof IdExpression && Objects.equals(((IdExpression) left).Id, "print") &&
-                    right instanceof IdExpression && Objects.equals(((IdExpression) right).Id, "print")) {
-                    BlockVisitor.validExpression = true;
-                    return new OperatorExpression(left, operator, right, "int");
-                }
-
-                while (left_helper instanceof OperatorExpression) {
-                    if (right_helper instanceof IdExpression && Objects.equals(((IdExpression) right_helper).Id, "print")) {
-                        if (((OperatorExpression) left_helper).leftExpression instanceof OperatorExpression) {
-                            left_helper = ((OperatorExpression) left_helper).leftExpression;
-                            right_helper = ((OperatorExpression) left_helper).rightExpression;
-                        } else if (((OperatorExpression) left_helper).leftExpression instanceof IdExpression &&
-                                     Objects.equals(((IdExpression) ((OperatorExpression) left_helper).leftExpression).Id, "print")){
-                            if (((OperatorExpression) left_helper).rightExpression instanceof IdExpression &&
-                                    Objects.equals(((IdExpression) ((OperatorExpression) left_helper).rightExpression).Id, "print")) {
-                                BlockVisitor.validExpression = true;
-                                return new OperatorExpression(left, operator, right, "int");
-                            } else {
-                                break;
-                            }
-
-                        } else {
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
+            if (leafCounter == 0 && allOperators.stream().allMatch("+"::equals)) {
+                BlockVisitor.validExpression = true;
+                return new OperatorExpression(left, operator, right, "int");
             }
         }
 
