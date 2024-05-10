@@ -1,9 +1,6 @@
 package at.tugraz.ist.cc.visitors;
 
-import at.tugraz.ist.cc.JovaBaseVisitor;
-import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.SymbolTable;
-import at.tugraz.ist.cc.SymbolTableStorage;
+import at.tugraz.ist.cc.*;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
