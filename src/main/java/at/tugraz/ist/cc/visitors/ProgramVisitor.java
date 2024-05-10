@@ -10,7 +10,6 @@ import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.error.warning.JovaWarning;
 import at.tugraz.ist.cc.error.warning.OverrideWarning;
 import at.tugraz.ist.cc.program.*;
-import kotlin.Pair;
 
 import java.util.*;
 
@@ -31,17 +30,11 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
     @Override
     public Program visitProgram(JovaParser.ProgramContext ctx) {
         Program program = new Program();
-        ArrayList<Pair<String, String>> waiting_list = new ArrayList<>();
-        ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor(semanticErrors, waiting_list);
-
+        ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor(semanticErrors);
 
         //-------------------------------------------------------------------------------
         for (int i = 0; i < ctx.getChildCount(); i++) {
             classDeclarationVisitor.visit(ctx.getChild(i));
-        }
-
-        for (Pair<String, String> p : waiting_list) {
-            SymbolTableStorage.getSymbolTableFromStorage(p.getFirst()).addBaseClass(SymbolTableStorage.getSymbolTableFromStorage(p.getSecond()));
         }
 
         //before that collect all decls and methods for symbol tables, after start with actual

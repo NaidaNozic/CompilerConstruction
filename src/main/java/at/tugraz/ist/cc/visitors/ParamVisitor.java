@@ -17,12 +17,11 @@ public class ParamVisitor extends JovaBaseVisitor<Param> {
     }
     @Override
     public Param visitParam(JovaParser.ParamContext ctx) {
+        TypeVisitor typeVisitor = new TypeVisitor(semanticErrors);
+        Type type = typeVisitor.visit(ctx.getChild(0));
         String id = ctx.getChild(1).getText();
         Integer line=ctx.ID().getSymbol().getLine();
         Integer column = ctx.ID().getSymbol().getCharPositionInLine();
-
-        TypeVisitor typeVisitor = new TypeVisitor(semanticErrors, line);
-        Type type = typeVisitor.visit(ctx.getChild(0));
         return new Param(type, id, line, column);
     }
 

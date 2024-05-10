@@ -3,19 +3,14 @@ package at.tugraz.ist.cc.visitors;
 import at.tugraz.ist.cc.*;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
-import kotlin.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
     public List<SemanticError> semanticErrors;
-    ArrayList<Pair<String, String>> waiting_list;
-
-    public ClassDeclarationVisitor(List<SemanticError> semanticErrors, ArrayList<Pair<String, String>> to_wait){
+    public ClassDeclarationVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
-        this.waiting_list = to_wait;
     }
     @Override
     public ClassDeclaration visitClass_decl(JovaParser.Class_declContext ctx) {
@@ -23,7 +18,6 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
         ClassBodyVisitor classBodyVisitor = new ClassBodyVisitor(semanticErrors);
 
         String id= ctx.getChild(0).getText();
-        String superclass_id= ctx.getChild(2).getText();
         int line =ctx.CLASS_ID(0).getSymbol().getLine();
 
         if(SymbolTableStorage.getMode()) {
@@ -32,14 +26,10 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
             SymbolTableStorage.addSymbolTableToStorage(classTable);
             SymbolTableStorage.pushScopeID(id);
 
-            if (ctx.getChildCount() == 4) {
+            if (ctx.getChildCount() == 4)
                 classBodyVisitor.visit(ctx.getChild(2));
-            }
-            else {
-                waiting_list.add(new Pair<>(id, superclass_id));
+            else
                 classBodyVisitor.visit(ctx.getChild(4)); //inheritance
-            }
-
 
             return null;
         } else {
@@ -47,13 +37,19 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
                 SymbolTableStorage.pushScopeID(id);
 
                 ClassBody classBody = classBodyVisitor.visit(ctx.getChild(2));
+                List<String> methods = null; //getMethods(classBody);
+                List<String> declarations = null; //getDeclarations(classBody);
                 classDeclaration = new ClassDeclaration(id, classBody, line);
             } else {
                 String superclass = ctx.getChild(2).getText();
+                SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(id);
+                classSymbolTable.addBaseClass(SymbolTableStorage.getSymbolTableFromStorage(superclass));
                 SymbolTableStorage.pushScopeID(id);
 
 
                 ClassBody classBody = classBodyVisitor.visit(ctx.getChild(4));
+                List<String> methods = null; // getMethods(classBody);
+                List<String> declarations = null; // getDeclarations(classBody);
                 classDeclaration = new ClassDeclaration(id, superclass, classBody, line);
             }
             return classDeclaration;
