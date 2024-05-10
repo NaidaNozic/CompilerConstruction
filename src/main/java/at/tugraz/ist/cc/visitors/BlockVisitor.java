@@ -101,7 +101,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         HashSet<Integer> added_lines = new HashSet<>();
 
         for (Param p : declaration.params) {
-            if (double_decl_helper.contains(p.id) && !added_lines.contains(p.line)) {
+            if (double_decl_helper.contains(p.id)) {
                 added_lines.add(p.line);
                 double_decl_helper.add(p.id);
                 semanticErrors.add(new IDDoubleDeclError(p.id, p.line));
