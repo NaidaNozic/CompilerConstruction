@@ -73,17 +73,17 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
 
             if (declarations != null)
                 for (Declaration declaration : declarations){
-                   // validateDeclarations(declaration);
+                    validateDeclarations(declaration);
                 }
 
             if (methods != null)
                 for (Method method : methods){
-                    //checkUndefinedParam(method.param);
+                    checkUndefinedParam(method.param);
 
                     for (Param param1 : method.paramList.params){
-                       // checkUndefinedParam(param1);
+                        checkUndefinedParam(param1);
                     }
-                   // validateBlock(method.block);
+                    validateBlock(method.block);
                 }
 
             if(newCheckInheritance(checkCycle, classDeclaration)){

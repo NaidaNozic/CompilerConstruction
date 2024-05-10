@@ -7,7 +7,6 @@ import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,19 +34,11 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
         SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
 
-        HashSet<String> double_decl_helper = new HashSet<>();
-        for (Param meth_p : methodParams.params) {
-            double_decl_helper.add(meth_p.id);
-        }
-
-
         for(int i=0; i<ctx.getChildCount(); i++){
             if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
-                SymbolTableStorage.switchMode();
-                Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
-                SymbolTableStorage.switchMode();
 
-                checkConflicts(declaration, double_decl_helper);
+                Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
+                checkConflicts(declaration, block.declarations);
                 block.declarations.add(declaration);
 
                 method_symbol_table.updateSymbolTable(declaration);
@@ -55,6 +46,16 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 if(ctx.parent instanceof JovaParser.If_stmtContext ||
                         ctx.parent instanceof JovaParser.While_stmtContext){
                     semanticErrors.add(new CannotDeclVarError(declaration.params.getFirst().line));
+                } else {
+                    if (methodParams != null) {
+                        for (Param p : declaration.params) {
+                            for (Param new_p : methodParams.params) {
+                                if (Objects.equals(p.id, new_p.id)) {
+                                    semanticErrors.add(new IDDoubleDeclError(p.id, p.line));
+                                }
+                            }
+                        }
+                    }
                 }
 
             } else if (ctx.getChild(i) instanceof JovaParser.ExprContext) {
@@ -112,20 +113,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
             }
         }
     }
-
-    private void checkConflicts(Declaration declaration, HashSet<String> double_decl_helper) {
-
-        HashSet<Integer> added_lines = new HashSet<>();
-
-        for (Param p : declaration.params) {
-            if (double_decl_helper.contains(p.id)) {
-                added_lines.add(p.line);
-                double_decl_helper.add(p.id);
-                semanticErrors.add(new IDDoubleDeclError(p.id, p.line));
-            }
-        }
-    }
-
 
     private boolean isNoMethod(IdExpression idExpression, SymbolTable mst)  {
         Symbol symbol;
