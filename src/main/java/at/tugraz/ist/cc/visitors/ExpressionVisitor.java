@@ -136,9 +136,41 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
         }
-        return new OperatorExpression(visit(ctx.getChild(0)),
-                ctx.getChild(1).getText(),
-                visit(ctx.getChild(2)));
+
+        Expression left = visit(ctx.getChild(0));
+        Expression right = visit(ctx.getChild(2));
+
+        if(left instanceof LiteralExpression){
+            semanticErrors.add(new VariableExpectedError(left.line));
+        }else{
+            if(right.type.equals("int") || right.type.equals("string") || right.type.equals("bool")) {
+                if (!left.type.equals(right.type)) {
+                    semanticErrors.add(new OperatorTypeError("=", left.line));
+                }
+            } else if (right.type.equals("nix")) {
+                if(left.type.equals("int") || left.type.equals("string") || left.type.equals("bool")){
+                    semanticErrors.add(new OperatorTypeError("=", left.line));
+                }
+            }else{
+                SymbolTable rightClassSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(right.type);
+                if(rightClassSymbolTable != null) {
+                    boolean isBaseClass = false;
+                    SymbolTable baseSymbolTable = rightClassSymbolTable.getBaseClass();
+                    while (baseSymbolTable != null) {
+                        if (baseSymbolTable.getScopeId().equals(left.type)) {
+                            isBaseClass = true;
+                            break;
+                        } else {
+                            baseSymbolTable = baseSymbolTable.getBaseClass();
+                        }
+                    }
+                    if (!isBaseClass) {
+                        semanticErrors.add(new OperatorTypeError("=", left.line));
+                    }
+                }
+            }
+        }
+        return new OperatorExpression(left, ctx.getChild(1).getText(), right);
     }
 
     @Override
