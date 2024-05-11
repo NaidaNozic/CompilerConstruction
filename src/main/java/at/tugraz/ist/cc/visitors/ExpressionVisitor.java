@@ -143,7 +143,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression left = visit(ctx.getChild(0));
         Expression right = visit(ctx.getChild(2));
 
-        if(!(left instanceof IdExpression)){
+        if(left instanceof LiteralExpression){
             semanticErrors.add(new VariableExpectedError(left.line));
         }else{
             if(right.type.equals("int") || right.type.equals("string") || right.type.equals("bool")) {
