@@ -2,6 +2,7 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.error.semantic.IntegerSizeError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
 
@@ -18,8 +19,15 @@ public class LiteralExpressionVisitor extends JovaBaseVisitor<LiteralExpression>
     @Override
     public LiteralExpression visitIntegerLiteral(JovaParser.IntegerLiteralContext ctx) {
         int line = ctx.INT().getSymbol().getLine();
-        Integer value = Integer.valueOf(ctx.getChild(0).getText());
-        return new IntegerLiteral(line,value);
+        try{
+            Integer value = Integer.valueOf(ctx.getChild(0).getText());
+            return new IntegerLiteral(line,value);
+        }
+        catch (NumberFormatException n){
+            IntegerSizeError size_err = new IntegerSizeError(line);
+            semanticErrors.add(size_err);
+            return new IntegerLiteral(line,0);
+        }
     }
 
     @Override
