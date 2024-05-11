@@ -35,6 +35,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
         }
+        if(this.leftExprOfAssignOperator){
+            this.invalidAssignLeftExpr = true;
+        }
         Expression e = visit(ctx.getChild(1));
         return new ParanthesisExpression(e, e.type);
     }
@@ -97,6 +100,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     public Expression visitAddNotExpression(JovaParser.AddNotExpressionContext ctx) {
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
+        }
+        if(this.leftExprOfAssignOperator){
+            this.invalidAssignLeftExpr = true;
         }
         String operator = null;
         if (ctx.NOT() != null){
@@ -205,6 +211,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
 
     private Expression operandsTypeEquality(JovaParser.ExprContext ctx) {
+        if(this.leftExprOfAssignOperator){
+            this.invalidAssignLeftExpr = true;
+        }
         Expression left = visit(ctx.getChild(0));
         Expression right = visit(ctx.getChild(2));
         String operator = ctx.getChild(1).getText();
