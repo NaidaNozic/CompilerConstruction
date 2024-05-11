@@ -10,7 +10,6 @@ public class IdExpression extends Expression{
     //needed to know if a method or ID is in the visitor (childCount == 1 then ID, if more -> method)
     public int childCount;
 
-
     public IdExpression(String Id, Integer line, int children) {
         super(line);
         this.Id = Id;
