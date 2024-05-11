@@ -43,6 +43,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         if(leftExprOfDotOperator != null && !invalidDotOperatorRightExpr) {
             checkExpressionWithDotOperator(idExpression, method_symbol_table);
         } else if(invalidDotOperatorRightExpr) {
+            semanticErrors.add(new MemberExpectedError(idExpression.line));
             idExpression.type = "invalid";
         }else{
             checkExpression(idExpression, method_symbol_table);

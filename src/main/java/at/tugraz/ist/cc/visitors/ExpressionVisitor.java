@@ -49,10 +49,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
         this.leftExprOfDotOperator = null;
-        if(this.invalidDotOperatorRightExpr){
-            semanticErrors.add(new MemberExpectedError(right.line));
-            right.type = "invalid";
-        }
         this.invalidDotOperatorRightExpr = false;
         return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
     }
