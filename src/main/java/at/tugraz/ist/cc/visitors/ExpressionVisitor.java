@@ -152,20 +152,24 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                     semanticErrors.add(new OperatorTypeError("=", left.line));
                 }
             }else{
-                SymbolTable rightClassSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(right.type);
-                if(rightClassSymbolTable != null) {
-                    boolean isBaseClass = false;
-                    SymbolTable baseSymbolTable = rightClassSymbolTable.getBaseClass();
-                    while (baseSymbolTable != null) {
-                        if (baseSymbolTable.getScopeId().equals(left.type)) {
-                            isBaseClass = true;
-                            break;
-                        } else {
-                            baseSymbolTable = baseSymbolTable.getBaseClass();
+                if (left.type.equals(right.type)) {
+                    return new OperatorExpression(left, ctx.getChild(1).getText(), right);
+                }else{
+                    SymbolTable rightClassSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(right.type);
+                    if(rightClassSymbolTable != null) {
+                        boolean isBaseClass = false;
+                        SymbolTable baseSymbolTable = rightClassSymbolTable.getBaseClass();
+                        while (baseSymbolTable != null) {
+                            if (baseSymbolTable.getScopeId().equals(left.type)) {
+                                isBaseClass = true;
+                                break;
+                            } else {
+                                baseSymbolTable = baseSymbolTable.getBaseClass();
+                            }
                         }
-                    }
-                    if (!isBaseClass) {
-                        semanticErrors.add(new OperatorTypeError("=", left.line));
+                        if (!isBaseClass) {
+                            semanticErrors.add(new OperatorTypeError("=", left.line));
+                        }
                     }
                 }
             }
@@ -201,6 +205,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
         boolean int_operands = Objects.equals(comp_left, "int") && Objects.equals(comp_right, "int");
         boolean bool_operands = Objects.equals(comp_left, "bool") && Objects.equals(comp_right, "bool");
+        boolean string_operands = Objects.equals(comp_left, "string") && Objects.equals(comp_right, "string");
 
         if (Objects.equals(operator, "+") || Objects.equals(operator, "-") ||
                 Objects.equals(operator, "*") || Objects.equals(operator, "/") || Objects.equals(operator, "%")) {
@@ -222,6 +227,10 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                 return new OperatorExpression(left, operator, right, "bool");
             } else {
                 semanticErrors.add(new OperatorTypeError(operator, left.line));
+            }
+        }else if (Objects.equals(operator,"==") || Objects.equals(operator,"!=")) {
+            if (bool_operands || int_operands || string_operands) {
+                return new OperatorExpression(left, operator, right, "bool");
             }
         }
 
