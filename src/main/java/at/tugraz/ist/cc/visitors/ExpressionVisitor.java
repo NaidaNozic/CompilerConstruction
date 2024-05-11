@@ -44,8 +44,11 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
         this.leftExprOfDotOperator = null;
+        if(this.invalidDotOperatorRightExpr){
+            semanticErrors.add(new MemberExpectedError(right.line));
+            right.type = "invalid";
+        }
         this.invalidDotOperatorRightExpr = false;
-
         return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
     }
     @Override
@@ -70,7 +73,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
-            semanticErrors.add(new MemberExpectedError(literal.line));
+            this.invalidDotOperatorRightExpr = true;
         }
         return literal;
     }
@@ -140,7 +143,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression left = visit(ctx.getChild(0));
         Expression right = visit(ctx.getChild(2));
 
-        if(left instanceof LiteralExpression){
+        if(!(left instanceof IdExpression)){
             semanticErrors.add(new VariableExpectedError(left.line));
         }else{
             if(right.type.equals("int") || right.type.equals("string") || right.type.equals("bool")) {
@@ -179,10 +182,11 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitNewClassExpression(JovaParser.NewClassExpressionContext ctx) {
+        NewClassExpression newClass = new NewClassExpression(ctx.CLASS_ID().getSymbol().getLine(), ctx.CLASS_ID().getText());
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
         }
-        return new NewClassExpression(ctx.CLASS_ID().getSymbol().getLine(), ctx.CLASS_ID().getText());
+        return newClass;
     }
 
 
