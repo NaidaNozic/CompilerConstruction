@@ -145,9 +145,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
         }
+        Expression right = visit(ctx.getChild(2));
         this.leftExprOfAssignOperator = true;
         Expression left = visit(ctx.getChild(0));
-        Expression right = visit(ctx.getChild(2));
         //if it finds a method call on the left expr, then error
         if(this.invalidAssignLeftExpr){
             semanticErrors.add(new VariableExpectedError(left.line));
@@ -155,6 +155,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
             this.invalidAssignLeftExpr = false;
             return new OperatorExpression(left, ctx.getChild(1).getText(), right);
         }
+        this.leftExprOfAssignOperator = false;
 
         if(left instanceof LiteralExpression){
             semanticErrors.add(new VariableExpectedError(left.line));
