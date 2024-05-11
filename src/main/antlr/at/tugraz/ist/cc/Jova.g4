@@ -56,19 +56,25 @@ fragment UPPERCASE : [A-Z] ;
  while_stmt : KEY_WHILE '(' expr ')' block ;
  return_stmt : KEY_RETURN expr ';' ;
 
- expr : literal                #LiteralExpression
-        | id_expr              #IdExpression
-        | KEY_NEW CLASS_ID     #NewClassExpression
-        | '(' expr ')'         #ParanthesisExpression
-        | expr DOT expr        #DotOperator
-        | (ADDOP | NOT) expr   #AddNotExpression
-        | expr MULOP expr      #MultiplicationOperator
-        | expr ADDOP expr      #AddOperator
-        | expr RELOP expr      #RelopOperator
-        | expr AND expr        #AndOperator
-        | expr OR expr         #OrOperator
-        | expr ASSIGN expr     #AssignOperator
-        ;
+ expr
+     : literal                #LiteralExpression
+     | id_expr               #IdExpression
+     | KEY_NEW CLASS_ID      #NewClassExpression
+     | '(' expr ')'          #ParanthesisExpression
+     | expr DOT expr         #DotOperator
+     | (ADDOP | NOT) expr    #AddNotExpression
+     | expr MULOP expr       #MultiplicationOperator
+     | expr ADDOP expr       #AddOperator
+     | expr RELOP expr       #RelopOperator
+     | expr AND expr         #AndOperator
+     | expr OR expr          #OrOperator
+     | expr ASSIGN exprRight #AssignOperator
+     ;
+
+exprRight
+    : expr                  #ExpressionRight
+    | (ASSIGN exprRight)    #AssignOperatorRight
+    ;
 
  id_expr : ID ( '(' ( (expr ',')* expr )? ')')? ;
  literal : INT      #IntegerLiteral

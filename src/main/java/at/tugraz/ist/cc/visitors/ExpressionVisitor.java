@@ -17,7 +17,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     public static ArrayList<String> allOperators = new ArrayList<>();
     public Expression leftExprOfDotOperator = null;
     public boolean invalidDotOperatorRightExpr = false;
-    public boolean leftExprOfAssignOperator = false; // will be true when we are in the assign operator
+    public boolean leftExprOfAssignOperator = false;
     public boolean invalidAssignLeftExpr = false;
     public ExpressionVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
@@ -143,6 +143,11 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     }
 
     @Override
+    public Expression visitExpressionRight(JovaParser.ExpressionRightContext ctx) {
+        return visit(ctx.getChild(0));
+    }
+
+    @Override
     public Expression visitAssignOperator(JovaParser.AssignOperatorContext ctx) {
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
@@ -161,7 +166,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
         if(left instanceof LiteralExpression){
             semanticErrors.add(new VariableExpectedError(left.line));
-        }else{
+        } else if (right instanceof ThisLiteral) {
+            semanticErrors.add(new OperatorTypeError("=", left.line));
+        } else{
             if(right.type.equals("int") || right.type.equals("string") || right.type.equals("bool")) {
                 if (!left.type.equals(right.type)) {
                     semanticErrors.add(new OperatorTypeError("=", left.line));
@@ -193,7 +200,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                 }
             }
         }
-        return new OperatorExpression(left, ctx.getChild(1).getText(), right);
+        return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
     }
 
     @Override
