@@ -44,10 +44,12 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitDotOperator(JovaParser.DotOperatorContext ctx) {
-
         Expression left = visit(ctx.getChild(0));
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
+        if(this.invalidDotOperatorRightExpr){
+            semanticErrors.add(new MemberExpectedError(right.line));
+        }
         this.leftExprOfDotOperator = null;
         this.invalidDotOperatorRightExpr = false;
         return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
