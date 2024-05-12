@@ -2,6 +2,7 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.error.semantic.ConditionTypeError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.Block;
 import at.tugraz.ist.cc.program.Expression;
@@ -27,6 +28,10 @@ public class WhileStatementVisitor extends JovaBaseVisitor<WhileStatement> {
         WhileStatement whileStatement = new WhileStatement(expression, new Block(), line);
 
         whileStatement.block = blockVisitor.visit(ctx.getChild(4));
+
+        if(!expression.type.equals("bool")){
+            semanticErrors.add(new ConditionTypeError(expression.line));
+        }
 
         return whileStatement;
     }
