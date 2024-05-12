@@ -259,7 +259,16 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
             if (bool_operands || int_operands || string_operands) {
                 return new OperatorExpression(left, operator, right, "bool");
             }
+            if(Objects.equals(comp_left, comp_right)){
+                return new OperatorExpression(left, operator, right, "bool");
+            }
+            if(subclassEquals(comp_left, comp_right)){
+                return new OperatorExpression(left, operator, right, "bool");
+            }
+            semanticErrors.add(new OperatorTypeError(operator, left.line));
         }
+        System.out.println(comp_left + " with " + comp_right);
+
 
         return new OperatorExpression(left, operator, right, "invalid");
     }
@@ -269,4 +278,29 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         allOperators.clear();
     }
 
+    private boolean subclassEquals(String left, String right){
+        SymbolTable leftST = SymbolTableStorage.getSymbolTableFromStorage(left);
+        SymbolTable rightST = SymbolTableStorage.getSymbolTableFromStorage(right);
+        if(leftST != null) {
+            SymbolTable baseSymbolTable = leftST.getBaseClass();
+            while (baseSymbolTable != null) {
+                if (baseSymbolTable.getScopeId().equals(right)) {
+                    return true;
+                } else {
+                    baseSymbolTable = baseSymbolTable.getBaseClass();
+                }
+            }
+        }
+        if(rightST != null) {
+            SymbolTable baseSymbolTable = rightST.getBaseClass();
+            while (baseSymbolTable != null) {
+                if (baseSymbolTable.getScopeId().equals(left)) {
+                    return true;
+                } else {
+                    baseSymbolTable = baseSymbolTable.getBaseClass();
+                }
+            }
+        }
+        return false;
+    }
 }
