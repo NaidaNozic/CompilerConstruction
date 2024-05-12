@@ -31,7 +31,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
         IdExpression idExpression = new IdExpression(ctx.getChild(0).getText(), ctx.ID().getSymbol().getLine(), ctx.getChildCount());
 
-
         for (int i = 2; i < ctx.getChildCount(); i += 2) {
             Expression expr = expressionVisitor.visit(ctx.getChild(i));
 
@@ -43,8 +42,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         if(leftExprOfDotOperator != null && !invalidDotOperatorRightExpr) {
             checkExpressionWithDotOperator(idExpression, method_symbol_table);
         } else if(invalidDotOperatorRightExpr) {
-            //System.out.println("TEST");
-            //semanticErrors.add(new MemberExpectedError(idExpression.line));
             idExpression.type = "invalid";
         }else{
             checkExpression(idExpression, method_symbol_table);
@@ -71,7 +68,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         }
 
         if(rightExpr.childCount == 1){
-            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, Symbol.SymbolType.VARIABLE);
             if(symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD) ){
                 rightExpr.type = symbol.getType().type;
             }else{
@@ -80,7 +77,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             }
         }else{
             ArrayList<String> arg_types = getArgTypes(rightExpr.expressions);
-            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, Symbol.SymbolType.METHOD);
 
             if (checkForPrint(rightExpr)) {
                 ExpressionVisitor.leafCounter--;
@@ -203,7 +200,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         return arg_types;
     }
 
-    private Symbol searchInSymbolTableWithDotOperator(IdExpression rightExpr, SymbolTable mst)
+    private Symbol searchInSymbolTableWithDotOperator(IdExpression rightExpr, SymbolTable mst, Symbol.SymbolType type)
     {
         SymbolTable classSymbolTable;
         if(this.leftExprOfDotOperator instanceof ThisLiteral){
@@ -214,16 +211,19 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         SymbolTable baseSymbolTable = classSymbolTable.getBaseClass();
 
         HashMap<String, Symbol> st = classSymbolTable.getSymbolTable();
-        if(st.containsKey(rightExpr.Id)){
-            return st.get(rightExpr.Id);
-        }else{
-            while(baseSymbolTable != null){
-                if (baseSymbolTable.getSymbolTable().containsKey(rightExpr.Id)) {
-                    return baseSymbolTable.getSymbolTable().get(rightExpr.Id);
-                } else {
-                    baseSymbolTable = baseSymbolTable.getBaseClass();
+
+        for (Symbol symbol : st.values()) {
+            if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
+                return symbol;
+            }
+        }
+        while(baseSymbolTable != null){
+            for (Symbol symbol : baseSymbolTable.getSymbolTable().values()) {
+                if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
+                    return symbol;
                 }
             }
+            baseSymbolTable = baseSymbolTable.getBaseClass();
         }
         return null;
     }
