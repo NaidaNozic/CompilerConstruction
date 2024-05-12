@@ -68,7 +68,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         }
 
         if(rightExpr.childCount == 1){
-            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, Symbol.SymbolType.VARIABLE);
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, null);
             if(symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD) ){
                 rightExpr.type = symbol.getType().type;
             }else{
@@ -211,16 +211,27 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         SymbolTable baseSymbolTable = classSymbolTable.getBaseClass();
 
         HashMap<String, Symbol> st = classSymbolTable.getSymbolTable();
-
-        for (Symbol symbol : st.values()) {
-            if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
-                return symbol;
+        if(type != null) {
+            for (Symbol symbol : st.values()) {
+                if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
+                    return symbol;
+                }
+            }
+        }else{
+            if(st.containsKey(rightExpr.Id)){
+                return st.get(rightExpr.Id);
             }
         }
         while(baseSymbolTable != null){
-            for (Symbol symbol : baseSymbolTable.getSymbolTable().values()) {
-                if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
-                    return symbol;
+            if(type != null) {
+                for (Symbol symbol : baseSymbolTable.getSymbolTable().values()) {
+                    if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
+                        return symbol;
+                    }
+                }
+            }else{
+                if(baseSymbolTable.getSymbolTable().containsKey(rightExpr.Id)){
+                    return baseSymbolTable.getSymbolTable().get(rightExpr.Id);
                 }
             }
             baseSymbolTable = baseSymbolTable.getBaseClass();
