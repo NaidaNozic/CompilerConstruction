@@ -212,6 +212,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
         }
+        if(this.leftExprOfAssignOperator){
+            this.invalidAssignLeftExpr = true;
+        }
         return newClass;
     }
 
