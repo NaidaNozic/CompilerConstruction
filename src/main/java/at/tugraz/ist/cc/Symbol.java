@@ -33,7 +33,7 @@ public class Symbol {
 
 
         for (Param p : params.params) {
-            paramSymbols.add(new Symbol(p.id, p.type, SymbolType.PARAMETER));
+            paramSymbols.add(new Symbol(p.id, p.type, SymbolType.VARIABLE));
         }
     }
 
