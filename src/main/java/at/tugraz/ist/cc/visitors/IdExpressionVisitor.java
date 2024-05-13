@@ -59,7 +59,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             if (rightExpr.childCount == 1) {
                 semanticErrors.add(new FieldUnknownError(leftExprOfDotOperator.type, rightExpr.Id, rightExpr.line));
             } else {
-                ArrayList<String> arg_types = getArgTypes(rightExpr.expressions);
+                ArrayList<String> arg_types = getArgTypes(rightExpr.expressions, mst);
                 semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
                         rightExpr.Id, arg_types, rightExpr.line));
             }
@@ -76,7 +76,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                 rightExpr.type = "invalid";
             }
         }else{
-            ArrayList<String> arg_types = getArgTypes(rightExpr.expressions);
+            ArrayList<String> arg_types = getArgTypes(rightExpr.expressions, mst);
             Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, Symbol.SymbolType.METHOD);
 
             if (checkForPrint(rightExpr)) {
@@ -192,10 +192,14 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
     }
 
 
-    private ArrayList<String> getArgTypes(List<Expression> expressions) {
+    private ArrayList<String> getArgTypes(List<Expression> expressions, SymbolTable mst) {
         ArrayList<String> arg_types = new ArrayList<>();
         for (Expression expr : expressions){
-            arg_types.add(expr.type);
+            if(expr.type.equals("this")){
+                arg_types.add(mst.getParent().getScopeId());
+            }else{
+                arg_types.add(expr.type);
+            }
         }
         return arg_types;
     }
