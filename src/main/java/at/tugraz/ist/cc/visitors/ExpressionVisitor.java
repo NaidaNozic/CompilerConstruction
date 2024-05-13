@@ -163,7 +163,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
             semanticErrors.add(new VariableExpectedError(left.line));
             this.leftExprOfAssignOperator = false;
             this.invalidAssignLeftExpr = false;
-            return new OperatorExpression(left, ctx.getChild(1).getText(), right);
+            return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
         }
         this.leftExprOfAssignOperator = false;
 
@@ -182,7 +182,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                 }
             }else{
                 if (left.type.equals(right.type)) {
-                    return new OperatorExpression(left, ctx.getChild(1).getText(), right);
+                    return new OperatorExpression(left, ctx.getChild(1).getText(), right, right.type);
                 }else{
                     SymbolTable rightClassSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(right.type);
                     if(rightClassSymbolTable != null) {
