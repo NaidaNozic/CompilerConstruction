@@ -288,6 +288,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     }
 
     private boolean subclassEquals(String left, String right){
+        if(Objects.equals(left, "nix") || Objects.equals(right, "nix")){
+            return true;
+        }
         SymbolTable leftST = SymbolTableStorage.getSymbolTableFromStorage(left);
         SymbolTable rightST = SymbolTableStorage.getSymbolTableFromStorage(right);
         if(leftST != null) {
