@@ -265,6 +265,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                 semanticErrors.add(new OperatorTypeError(operator, left.line));
             }
         }else if (Objects.equals(operator,"==") || Objects.equals(operator,"!=")) {
+            System.out.println("Check this:" + comp_left + " with " + comp_right);
             if (bool_operands || int_operands || string_operands) {
                 return new OperatorExpression(left, operator, right, "bool");
             }
@@ -288,28 +289,45 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     }
 
     private boolean subclassEquals(String left, String right){
+        if(Objects.equals("int", left) || Objects.equals("bool", left) || Objects.equals("string", left)){
+            return false;
+        }
+        if(Objects.equals("int", right) || Objects.equals("bool", right) || Objects.equals("string", right)){
+            return false;
+        }
+
+
         if(Objects.equals(left, "nix") || Objects.equals(right, "nix")){
             return true;
         }
+
+        System.out.println("what?");
         SymbolTable leftST = SymbolTableStorage.getSymbolTableFromStorage(left);
         SymbolTable rightST = SymbolTableStorage.getSymbolTableFromStorage(right);
+
+        SymbolTable baseST = null;
         if(leftST != null) {
-            SymbolTable baseSymbolTable = leftST.getBaseClass();
-            while (baseSymbolTable != null) {
-                if (baseSymbolTable.getScopeId().equals(right)) {
+            SymbolTable baseSymbolTable1 = leftST.getBaseClass();
+            while (baseSymbolTable1 != null) {
+                if (baseSymbolTable1.getScopeId().equals(right)) {
                     return true;
                 } else {
-                    baseSymbolTable = baseSymbolTable.getBaseClass();
+                    baseST = baseSymbolTable1;
+                    baseSymbolTable1 = baseSymbolTable1.getBaseClass();
                 }
             }
+
         }
         if(rightST != null) {
-            SymbolTable baseSymbolTable = rightST.getBaseClass();
-            while (baseSymbolTable != null) {
-                if (baseSymbolTable.getScopeId().equals(left)) {
+            SymbolTable baseSymbolTable2 = rightST.getBaseClass();
+            while (baseSymbolTable2 != null) {
+                if (baseSymbolTable2.getScopeId().equals(left)) {
                     return true;
                 } else {
-                    baseSymbolTable = baseSymbolTable.getBaseClass();
+                    if(baseST != null && baseSymbolTable2.getScopeId().equals(baseST.getScopeId())){
+                        return true;
+                    }
+                    baseSymbolTable2 = baseSymbolTable2.getBaseClass();
                 }
             }
         }
