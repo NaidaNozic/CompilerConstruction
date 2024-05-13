@@ -9,7 +9,7 @@ import java.util.Objects;
 public class SymbolTable {
 
     private String scopeId;
-    private HashMap<String, ArrayList<Symbol>> symbolTable;
+    private HashMap<String, Symbol> symbolTable;
     private SymbolTable parent;
     private ArrayList<SymbolTable> children;
 
@@ -65,78 +65,33 @@ public class SymbolTable {
 
     //---------------- one element to update ----------------------------------------------------------------------
     public void updateSymbolTable(Param param){
-//        symbolTable.get(param.id).add(new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-//        symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-
-        if (symbolTable.containsKey(param.id)) {
-            symbolTable.get(param.id).add(new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-        } else {
-            ArrayList<Symbol> l = new ArrayList<>();
-            l.add(new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-
-            symbolTable.put(param.id, l);
-        }
+        symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.PARAMETER));
     }
 
     public void updateSymbolTable(Declaration declaration){
         for (Param param : declaration.params) {
             if (param.type instanceof ClassType) {
-//                symbolTable.get(param.id).add(new Symbol(param.id, param.type, Symbol.SymbolType.CLASS));
-//                symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.CLASS));
-
-                if (symbolTable.containsKey(param.id)) {
-                    symbolTable.get(param.id).add(new Symbol(param.id, param.type, Symbol.SymbolType.CLASS));
-                } else {
-                    ArrayList<Symbol> l = new ArrayList<>();
-                    l.add(new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-
-                    symbolTable.put(param.id, l);
-                }
+                symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.CLASS));
             } else {
-                if (symbolTable.containsKey(param.id)) {
-                    symbolTable.get(param.id).add(new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-                } else {
-                    ArrayList<Symbol> l = new ArrayList<>();
-                    l.add(new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-
-                    symbolTable.put(param.id, l);
-                }
-
-
-//                symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
+                symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
             }
         }
     }
 
     public void updateSymbolTable(Method method) {
-//        symbolTable.put(method.param.id, new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
-
-        if (symbolTable.containsKey(method.param.id)) {
-            symbolTable.get(method.param.id).add(new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
-        } else {
-            ArrayList<Symbol> l = new ArrayList<>();
-            l.add(new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
-
-            symbolTable.put(method.param.id, l);
-        }
+        symbolTable.put(method.param.id, new Symbol(method.param.id, method.param.type, Symbol.SymbolType.METHOD, method.paramList));
     }
 
     public void updateSymbolTable(String self) {
-        ArrayList<Symbol> l = new ArrayList<>();
-        l.add(new Symbol(self, new ClassType(self), Symbol.SymbolType.CLASS));
-
-        symbolTable.put(self, l);
-
-//        symbolTable.put(self, new Symbol(self, new ClassType(self), Symbol.SymbolType.CLASS));
+        symbolTable.put(self, new Symbol(self, new ClassType(self), Symbol.SymbolType.CLASS));
     }
-
     //-------------------------------------------------------------------------------------------------------------
 
     public String getScopeId() {
         return scopeId;
     }
 
-    public HashMap<String, ArrayList<Symbol>> getSymbolTable() {
+    public HashMap<String, Symbol> getSymbolTable() {
         return symbolTable;
     }
 }

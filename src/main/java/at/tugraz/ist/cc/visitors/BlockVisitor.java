@@ -7,7 +7,6 @@ import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -101,6 +100,19 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         return block;
     }
 
+    //old version
+    private void checkConflicts(Declaration declaration, List<Declaration> declarations) {
+
+        for (Param currentParam : declaration.params) {
+            for (Declaration decl : declarations) {
+                for (Param otherParam : decl.params) {
+                    if (otherParam.id.equals(currentParam.id)) {
+                        semanticErrors.add(new IDDoubleDeclError(currentParam.id, currentParam.line));
+                    }
+                }
+            }
+        }
+    }
 
     //new version
     private void checkConflicts(Declaration declaration, HashSet<String> double_decl_helper) {
@@ -120,29 +132,21 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         Symbol symbol;
 
         if (mst.getSymbolTable().containsKey(idExpression.Id)){
-
-            return filterNeededSymbol(mst.getSymbolTable().get(idExpression.Id));
+            symbol = mst.getSymbolTable().get(idExpression.Id);
+            return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
         } else {
             SymbolTable st_helper = mst.getParent().getBaseClass();
 
             while (st_helper != null) {
                 if (st_helper.getSymbolTable().containsKey(idExpression.Id)) {
-                    return filterNeededSymbol(mst.getSymbolTable().get(idExpression.Id));
+                    symbol = st_helper.getSymbolTable().get(idExpression.Id);
+                    return symbol.getSymbolType() != Symbol.SymbolType.METHOD;
                 } else {
                     st_helper = st_helper.getBaseClass();
                 }
             }
         }
 
-        return false;
-    }
-
-    private boolean filterNeededSymbol(ArrayList<Symbol> symbol_list) {
-        for (Symbol s : symbol_list){
-            if(s.getSymbolType() == Symbol.SymbolType.METHOD){
-                return true;
-            }
-        }
         return false;
     }
 

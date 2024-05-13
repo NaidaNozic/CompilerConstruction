@@ -239,7 +239,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
             }
         }
 
-
         boolean int_operands = Objects.equals(comp_left, "int") && Objects.equals(comp_right, "int");
         boolean bool_operands = Objects.equals(comp_left, "bool") && Objects.equals(comp_right, "bool");
         boolean string_operands = Objects.equals(comp_left, "string") && Objects.equals(comp_right, "string");
@@ -316,5 +315,4 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         }
         return false;
     }
-
 }
