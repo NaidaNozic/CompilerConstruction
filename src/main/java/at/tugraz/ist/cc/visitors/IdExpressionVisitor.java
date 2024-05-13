@@ -113,7 +113,9 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
 
                     for (int i = 0; i < param_symbols.size(); i++) {
-                        if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i))) {
+                        if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i)) &&
+                                !(arg_types.get(i).equals("nix") && !(param_symbols.get(i).getType().type.equals("int") ||
+                                        param_symbols.get(i).getType().type.equals("bool")))) {
                             semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
                                     rightExpr.Id, arg_types, rightExpr.line));
                             rightExpr.type = "invalid";
