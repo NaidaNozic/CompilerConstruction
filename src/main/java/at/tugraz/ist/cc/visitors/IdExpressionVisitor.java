@@ -133,7 +133,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         if (idExpression.childCount == 1) { //that's a variable
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
-            if (symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD)) {
+            if (symbol != null && symbol.getSymbolType() != Symbol.SymbolType.METHOD && symbol.getSymbolType() != Symbol.SymbolType.CLASS) {
                 ExpressionVisitor.leafCounter++;
                 idExpression.type = symbol.getType().type;
             } else {
