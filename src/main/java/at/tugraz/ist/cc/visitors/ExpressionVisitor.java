@@ -231,13 +231,19 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         String comp_right = right.type;
         if(this.invalidDotOperatorRightExpr)return new OperatorExpression(left, operator, right, "invalid");
 
-        if (ctx.parent instanceof JovaParser.BlockContext && Objects.equals(operator, "+") &&
+        if (ctx.parent instanceof JovaParser.BlockContext || (ctx.parent instanceof JovaParser.ParanthesisExpressionContext) &&
+                Objects.equals(operator, "+") &&
                 !(Objects.equals(left.type, "invalid") || Objects.equals(right.type, "invalid"))) {
-            if (leafCounter == 0 && allOperators.stream().allMatch("+"::equals)) {
-                BlockVisitor.validExpression = true;
-                return new OperatorExpression(left, operator, right, "int");
+            if (allOperators.stream().allMatch("+"::equals)) {
+
+                if (checkPrintSequence(left, right)) {
+                    BlockVisitor.validExpression = true;
+                    return new OperatorExpression(left, operator, right, "int");
+                }
             }
         }
+
+
 
         boolean int_operands = Objects.equals(comp_left, "int") && Objects.equals(comp_right, "int");
         boolean bool_operands = Objects.equals(comp_left, "bool") && Objects.equals(comp_right, "bool");
@@ -331,6 +337,24 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                 }
             }
         }
+        return false;
+    }
+
+    private boolean checkPrintSequence(Expression left, Expression right){
+        if (right instanceof IdExpression && Objects.equals(((IdExpression) right).Id, "print") &&
+                ((IdExpression) right).expressions.size() == 1) {
+            if (left instanceof IdExpression) {
+                return Objects.equals(((IdExpression) left).Id, "print") &&
+                        ((IdExpression) left).expressions.size() == 1;
+            }
+        } else {
+            return false;
+        }
+
+        if (left instanceof OperatorExpression) {
+            return checkPrintSequence(((OperatorExpression) left).leftExpression, ((OperatorExpression) left).rightExpression);
+        }
+
         return false;
     }
 }

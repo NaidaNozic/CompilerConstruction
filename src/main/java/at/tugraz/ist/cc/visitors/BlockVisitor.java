@@ -63,6 +63,9 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 Expression expression = expressionVisitor.visit(ctx.getChild(i));
                 block.expressions.add(expression);
 
+
+
+
                 if (expression instanceof OperatorExpression &&
                         !(((OperatorExpression) expression).operator).equals("=") && !validExpression &&
                         !(((OperatorExpression) expression).operator).equals(".")){
@@ -73,6 +76,20 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 } else if (expression instanceof IdExpression && isNoMethod((IdExpression) expression, method_symbol_table)) {
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
+                } else if (expression instanceof ParanthesisExpression && !validExpression) {
+                    Expression e_helper = expression;
+
+                    while (e_helper instanceof ParanthesisExpression) {
+                        e_helper = ((ParanthesisExpression) e_helper).expression;
+                    }
+
+                    if (e_helper instanceof IdExpression && isNoMethod((IdExpression) e_helper, method_symbol_table)) {
+                        semanticErrors.add(new AssignmentExpectedError(expression.line));
+                    } else if (e_helper instanceof  OperatorExpression || e_helper instanceof IntegerLiteral ||
+                            e_helper instanceof BooleanLiteral || e_helper instanceof StringLiteral) {
+                        semanticErrors.add(new AssignmentExpectedError(expression.line));
+                    }
+
                 }
 
                 ExpressionVisitor.reset();
