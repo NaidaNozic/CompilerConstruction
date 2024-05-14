@@ -100,19 +100,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         return block;
     }
 
-    //old version
-    private void checkConflicts(Declaration declaration, List<Declaration> declarations) {
-
-        for (Param currentParam : declaration.params) {
-            for (Declaration decl : declarations) {
-                for (Param otherParam : decl.params) {
-                    if (otherParam.id.equals(currentParam.id)) {
-                        semanticErrors.add(new IDDoubleDeclError(currentParam.id, currentParam.line));
-                    }
-                }
-            }
-        }
-    }
 
     //new version
     private void checkConflicts(Declaration declaration, HashSet<String> double_decl_helper) {
