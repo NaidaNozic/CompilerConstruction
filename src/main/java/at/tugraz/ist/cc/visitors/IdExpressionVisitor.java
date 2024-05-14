@@ -54,13 +54,17 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             rightExpr.type = "invalid";
             return;
         }
+        String type = leftExprOfDotOperator.type;
+        if(type.equals("this")){
+            type = mst.getParent().getScopeId();
+        }
         if (leftExprOfDotOperator.type.equals("int") || leftExprOfDotOperator.type.equals("bool") ||
                 leftExprOfDotOperator.type.equals("string") || leftExprOfDotOperator.type.equals("nix")) {
             if (rightExpr.childCount == 1) {
-                semanticErrors.add(new FieldUnknownError(leftExprOfDotOperator.type, rightExpr.Id, rightExpr.line));
+                semanticErrors.add(new FieldUnknownError(type, rightExpr.Id, rightExpr.line));
             } else {
                 ArrayList<String> arg_types = getArgTypes(rightExpr.expressions, mst);
-                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
             }
             rightExpr.type = "invalid";
@@ -68,32 +72,32 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         }
 
         if(rightExpr.childCount == 1){
-            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, null);
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
             if(symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD) ){
                 rightExpr.type = symbol.getType().type;
             }else{
-                semanticErrors.add(new FieldUnknownError(leftExprOfDotOperator.type, rightExpr.Id, rightExpr.line));
+                semanticErrors.add(new FieldUnknownError(type, rightExpr.Id, rightExpr.line));
                 rightExpr.type = "invalid";
             }
         }else{
             ArrayList<String> arg_types = getArgTypes(rightExpr.expressions, mst);
-            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst, Symbol.SymbolType.METHOD);
+            Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
 
             if (checkForPrint(rightExpr)) {
                 ExpressionVisitor.leafCounter--;
-                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "int";
                 return;
             } else if (checkForReadInt(rightExpr)) {
                 ExpressionVisitor.leafCounter++;
-                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "int";
                 return;
             } else if (checkForReadLine(rightExpr)) {
                 ExpressionVisitor.leafCounter++;
-                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "string";
                 return;
@@ -107,7 +111,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     return;
                 }
             }
-
             if (symbol != null && symbol.getSymbolType() == Symbol.SymbolType.METHOD) {
                 if (symbol.getParamSymbols().size() == arg_types.size()) {
                     ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
@@ -118,7 +121,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                                         param_symbols.get(i).getType().type.equals("bool")))) {
                             //test if we have a base class and subclass sent to it
                             if(!getBaseAndSubclassComparison(param_symbols.get(i).getType().type, arg_types.get(i))){
-                                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                                semanticErrors.add(new MemberFunctionUnknownError(type,
                                         rightExpr.Id, arg_types, rightExpr.line));
                                 rightExpr.type = "invalid";
                                 return;
@@ -129,7 +132,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     return;
                 }
             }
-            semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+            semanticErrors.add(new MemberFunctionUnknownError(type,
                     rightExpr.Id, arg_types, rightExpr.line));
             rightExpr.type = "invalid";
         }
@@ -223,7 +226,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         return arg_types;
     }
 
-    private Symbol searchInSymbolTableWithDotOperator(IdExpression rightExpr, SymbolTable mst, Symbol.SymbolType type)
+    private Symbol searchInSymbolTableWithDotOperator(IdExpression rightExpr, SymbolTable mst)
     {
         SymbolTable classSymbolTable;
         if(this.leftExprOfDotOperator instanceof ThisLiteral){
@@ -233,31 +236,16 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         }
         SymbolTable baseSymbolTable = classSymbolTable.getBaseClass();
 
-        HashMap<String, Symbol> st = classSymbolTable.getSymbolTable();
-        if(type != null) {
-            for (Symbol symbol : st.values()) {
-                if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
-                    return symbol;
-                }
-            }
-        }else{
-            if(st.containsKey(rightExpr.Id)){
-                return st.get(rightExpr.Id);
-            }
-        }
-        while(baseSymbolTable != null){
-            if(type != null) {
-                for (Symbol symbol : baseSymbolTable.getSymbolTable().values()) {
-                    if (symbol.getId().equals(rightExpr.Id) && symbol.getSymbolType() == type) {
-                        return symbol;
-                    }
-                }
-            }else{
-                if(baseSymbolTable.getSymbolTable().containsKey(rightExpr.Id)){
+        if (classSymbolTable.getSymbolTable().containsKey(rightExpr.Id)) {
+            return classSymbolTable.getSymbolTable().get(rightExpr.Id);
+        } else {
+            while (baseSymbolTable != null) {
+                if (baseSymbolTable.getSymbolTable().containsKey(rightExpr.Id)) {
                     return baseSymbolTable.getSymbolTable().get(rightExpr.Id);
+                } else {
+                    baseSymbolTable = baseSymbolTable.getBaseClass();
                 }
             }
-            baseSymbolTable = baseSymbolTable.getBaseClass();
         }
         return null;
     }
