@@ -116,10 +116,13 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                         if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i)) &&
                                 !(arg_types.get(i).equals("nix") && !(param_symbols.get(i).getType().type.equals("int") ||
                                         param_symbols.get(i).getType().type.equals("bool")))) {
-                            semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
-                                    rightExpr.Id, arg_types, rightExpr.line));
-                            rightExpr.type = "invalid";
-                            return;
+                            //test if we have a base class and subclass sent to it
+                            if(!getBaseAndSubclassComparison(param_symbols.get(i).getType().type, arg_types.get(i))){
+                                semanticErrors.add(new MemberFunctionUnknownError(leftExprOfDotOperator.type,
+                                        rightExpr.Id, arg_types, rightExpr.line));
+                                rightExpr.type = "invalid";
+                                return;
+                            }
                         }
                     }
                     rightExpr.type = symbol.getType().type;
@@ -130,6 +133,20 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     rightExpr.Id, arg_types, rightExpr.line));
             rightExpr.type = "invalid";
         }
+    }
+
+    private boolean getBaseAndSubclassComparison(String base, String subclass){
+
+        SymbolTable classSymbolTable = SymbolTableStorage.getSymbolTableFromStorage(subclass);
+        if(classSymbolTable == null) return false;
+        SymbolTable baseSymbolTable = classSymbolTable.getBaseClass();
+        while (baseSymbolTable != null){
+            if(baseSymbolTable.getScopeId().equals(base)){
+                return true;
+            }
+            baseSymbolTable = baseSymbolTable.getBaseClass();
+        }
+        return false;
     }
     private void checkExpression(IdExpression idExpression, SymbolTable mst) {
         if (idExpression.childCount == 1) { //that's a variable
