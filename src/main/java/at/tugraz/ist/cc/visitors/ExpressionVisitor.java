@@ -48,7 +48,19 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
         if(this.invalidDotOperatorRightExpr){
-            if(!left.type.equals("invalid")) semanticErrors.add(new MemberExpectedError(left.line));
+            if(this.invalidDotOperatorRightExpr){
+                if(!left.type.equals("invalid")){
+                    if(right.type.equals("this")){
+                        String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
+                        SymbolTable mst = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
+                        semanticErrors.add(new FieldUnknownError(mst.getParent().getScopeId(), "this", right.line));
+                        left.type = "invalid";
+                    }else{
+                        semanticErrors.add(new MemberExpectedError(left.line));
+                    }
+                }
+            }
+           // if(!left.type.equals("invalid")) semanticErrors.add(new MemberExpectedError(left.line));
         }
         String type = this.invalidDotOperatorRightExpr? "invalid" : right.type;
         this.invalidDotOperatorRightExpr = false;
