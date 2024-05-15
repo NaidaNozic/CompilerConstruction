@@ -47,9 +47,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression left = visit(ctx.getChild(0));
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
-        if(this.invalidDotOperatorRightExpr){
+        /*if(this.invalidDotOperatorRightExpr){
             if(!left.type.equals("invalid")) semanticErrors.add(new MemberExpectedError(left.line));
-        }
+        }*/
         String type = this.invalidDotOperatorRightExpr? "invalid" : right.type;
         this.invalidDotOperatorRightExpr = false;
         this.leftExprOfDotOperator = null;
@@ -79,6 +79,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
+            semanticErrors.add(new MemberExpectedError(literal.line));
         }
         return literal;
     }
@@ -209,14 +210,13 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitNewClassExpression(JovaParser.NewClassExpressionContext ctx) {
-        NewClassExpression newClass = new NewClassExpression(ctx.CLASS_ID().getSymbol().getLine(), ctx.CLASS_ID().getText());
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
         }
         if(this.leftExprOfAssignOperator){
             this.invalidAssignLeftExpr = true;
         }
-        return newClass;
+        return new NewClassExpression(ctx.CLASS_ID().getSymbol().getLine(), ctx.CLASS_ID().getText());
     }
 
 
