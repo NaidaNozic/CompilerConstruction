@@ -1,14 +1,12 @@
 package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.*;
-import at.tugraz.ist.cc.error.semantic.AssignmentExpectedError;
-import at.tugraz.ist.cc.error.semantic.CannotDeclVarError;
-import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
-import at.tugraz.ist.cc.error.semantic.SemanticError;
+import at.tugraz.ist.cc.error.semantic.*;
 import at.tugraz.ist.cc.program.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 public class BlockVisitor extends JovaBaseVisitor<Block> {
 
@@ -32,7 +30,11 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
 
         String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
+        System.out.println("Hello! " + method_scope_id);
         SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
+        SymbolTable parent = method_symbol_table.getParent();
+        String method_type = parent.getSymbolTable().get(method_scope_id).getType().type;
+        System.out.println("Parent: " + parent.getSymbolTable().get(method_scope_id).getType().type);
 
         HashSet<String> double_decl_helper = new HashSet<>();
 
@@ -109,8 +111,21 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
             } else if (ctx.getChild(i) instanceof  JovaParser.Return_stmtContext) {
 
+                String ret_symbol = ctx.getChild(i).getChild(1).getText();
+                Object ret = method_symbol_table.getSymbolTable().get(ret_symbol);
+                String ret_type = null;
+                if(ret != null){
+                    ret_type = method_symbol_table.getSymbolTable().get(ret_symbol).getType().type;
+                }
+                System.out.println("Returns " + ctx.getChild(i).getChild(1).getText() + ", type " + ret_type);
                 ReturnStatement returnStatement = returnStatementVisitor.visit(ctx.getChild(i));
                 block.returnStatements.add(returnStatement);
+                if(ret_type == null){
+                    ret_type = returnStatement.expression.type;
+                }
+                if(!Objects.equals(method_type, ret_type)){
+                    semanticErrors.add(new ReturnTypeError(returnStatement.line));
+                }
 
             }
         }
