@@ -32,9 +32,9 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     }
     @Override
     public Expression visitParanthesisExpression(JovaParser.ParanthesisExpressionContext ctx) {
-        if(this.leftExprOfDotOperator != null) {
+        /*if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
-        }
+        }*/
         if(this.leftExprOfAssignOperator){
             this.invalidAssignLeftExpr = true;
         }
@@ -47,9 +47,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression left = visit(ctx.getChild(0));
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
-        /*if(this.invalidDotOperatorRightExpr){
-            if(!left.type.equals("invalid")) semanticErrors.add(new MemberExpectedError(left.line));
-        }*/
         String type = this.invalidDotOperatorRightExpr? "invalid" : right.type;
         this.invalidDotOperatorRightExpr = false;
         this.leftExprOfDotOperator = null;
