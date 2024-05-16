@@ -114,7 +114,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                 ReturnStatement returnStatement = returnStatementVisitor.visit(ctx.getChild(i));
 
                 if (!(Objects.equals(returnStatement.expression.type, method_type) ||
-                        (checkObjectTypes(method_type, returnStatement.expression.type)))) {
+                        (checkClassTypes(method_type, returnStatement.expression.type)))) {
                     semanticErrors.add(new ReturnTypeError(returnStatement.line));
                 }
 
@@ -123,7 +123,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         return block;
     }
 
-    private boolean checkObjectTypes(String methodType, String retType){
+    private boolean checkClassTypes(String methodType, String retType){
         SymbolTable ret_type_class = SymbolTableStorage.getSymbolTableFromStorage(retType);
 
         if (Objects.equals(retType, "nix")) {
