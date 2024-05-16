@@ -28,8 +28,7 @@ public class LiteralExpressionVisitor extends JovaBaseVisitor<LiteralExpression>
             return new IntegerLiteral(line,ctx.getChild(0).getText());
         }
         catch (NumberFormatException n){
-            IntegerSizeError size_err = new IntegerSizeError(line);
-            semanticErrors.add(size_err);
+            semanticErrors.add(new IntegerSizeError(line));
             return new IntegerLiteral(line,"0");
         }
     }
