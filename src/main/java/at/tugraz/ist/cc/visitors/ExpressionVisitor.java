@@ -43,11 +43,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
 
-        if (right.type.equals("this") & (left.type.equals("int") || left.type.equals("bool") ||
-                left.type.equals("string") || left.type.equals("nix"))) {
-            semanticErrors.add(new FieldUnknownError(this.leftExprOfDotOperator.type,
-                    "this", right.line));
-        } else if (this.invalidDotOperatorRightExpr) {
+        if (this.invalidDotOperatorRightExpr) {
             semanticErrors.add(new MemberExpectedError(this.leftExprOfDotOperator.line));
         }
 
@@ -77,6 +73,7 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
+            System.out.println("HMMM");
             this.invalidDotOperatorRightExpr = true;
         }
         return literal;
