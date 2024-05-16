@@ -118,27 +118,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                     semanticErrors.add(new ReturnTypeError(returnStatement.line));
                 }
 
-
-//
-//                String ret_symbol = ctx.getChild(i).getChild(1).getText();
-//                Object ret = method_symbol_table.getSymbolTable().get(ret_symbol);
-//                String ret_type = null;
-//                if(ret != null){
-//                    ret_type = method_symbol_table.getSymbolTable().get(ret_symbol).getType().type;
-//                }
-//                System.out.println("Returns " + ctx.getChild(i).getChild(1).getText() + ", type " + ret_type);
-//                ReturnStatement returnStatement = returnStatementVisitor.visit(ctx.getChild(i));
-//                block.returnStatements.add(returnStatement);
-//                if(ret_type == null){
-//                    ret_type = returnStatement.expression.type;
-//                }
-//                if(!Objects.equals(method_type, ret_type)){
-//                    if(!nixEqual(method_type, ret_type) && !baseEqual(method_type, ret_type)){
-//                        semanticErrors.add(new ReturnTypeError(returnStatement.line));
-//                    }
-//
-//                }
-
             }
         }
         return block;
@@ -148,7 +127,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         SymbolTable ret_type_class = SymbolTableStorage.getSymbolTableFromStorage(retType);
 
         if (Objects.equals(retType, "nix")) {
-            return !Objects.equals(methodType, "string") || !Objects.equals(methodType, "bool") || !Objects.equals(methodType, "int");
+            return !(Objects.equals(methodType, "string") || Objects.equals(methodType, "bool") || Objects.equals(methodType, "int"));
         }
 
         if (ret_type_class != null) {
@@ -165,53 +144,6 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         return false;
     }
 
-    private boolean baseEqual(String methodType, String retType) {
-        SymbolTable methodST = SymbolTableStorage.getSymbolTableFromStorage(methodType);
-        SymbolTable retST = SymbolTableStorage.getSymbolTableFromStorage(retType);
-        System.out.println("methodST : " + methodST.getScopeId());
-        System.out.println("retST : " + retST.getScopeId());
-        SymbolTable baseST = null;
-        if(methodST != null) {
-            SymbolTable baseSymbolTable1 = methodST.getBaseClass();
-
-            while (baseSymbolTable1 != null) {
-                if (baseSymbolTable1.getScopeId().equals(retType)) {
-                    return true;
-                } else {
-                    baseST = baseSymbolTable1;
-                    baseSymbolTable1 = baseSymbolTable1.getBaseClass();
-                }
-            }
-
-        }
-        if(retST != null) {
-            SymbolTable baseSymbolTable2 = retST.getBaseClass();
-            while (baseSymbolTable2 != null) {
-                if (baseSymbolTable2.getScopeId().equals(methodType)) {
-                    return true;
-                } else {
-                    if(baseST != null && baseSymbolTable2.getScopeId().equals(baseST.getScopeId())){
-                        return true;
-                    }
-                    baseSymbolTable2 = baseSymbolTable2.getBaseClass();
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean nixEqual(String methodType, String retType) {
-        if (Objects.equals(retType, "nix")) {
-            return !Objects.equals(methodType, "string") && !Objects.equals(methodType, "bool") && !Objects.equals(methodType, "int");
-        }
-        return true;
-
-
-//        if(Objects.equals(methodType, "string") || Objects.equals(methodType, "bool") || Objects.equals(methodType,"int")){
-//           return false;
-//        }
-//        return Objects.equals(retType, "nix");
-    }
 
 
     //new version
