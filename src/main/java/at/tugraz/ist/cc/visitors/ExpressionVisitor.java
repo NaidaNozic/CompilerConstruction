@@ -30,9 +30,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     }
     @Override
     public Expression visitParanthesisExpression(JovaParser.ParanthesisExpressionContext ctx) {
-        /*if(this.leftExprOfDotOperator != null) {
-            this.invalidDotOperatorRightExpr = true;
-        }*/
         if(this.leftExprOfAssignOperator){
             this.invalidAssignLeftExpr = true;
         }
@@ -45,11 +42,19 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression left = visit(ctx.getChild(0));
         this.leftExprOfDotOperator = left;
         Expression right = visit(ctx.getChild(2));
+
+        if (right.type.equals("this") & (left.type.equals("int") || left.type.equals("bool") ||
+                left.type.equals("string") || left.type.equals("nix"))) {
+            semanticErrors.add(new FieldUnknownError(this.leftExprOfDotOperator.type,
+                    "this", right.line));
+        } else if (this.invalidDotOperatorRightExpr) {
+            semanticErrors.add(new MemberExpectedError(this.leftExprOfDotOperator.line));
+        }
+
         String type = this.invalidDotOperatorRightExpr? "invalid" : right.type;
         this.invalidDotOperatorRightExpr = false;
         this.leftExprOfDotOperator = null;
         return new OperatorExpression(left, ctx.getChild(1).getText(), right, type);
-
     }
     @Override
     public Expression visitAddOperator(JovaParser.AddOperatorContext ctx) {
@@ -73,7 +78,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
             this.invalidDotOperatorRightExpr = true;
-            semanticErrors.add(new MemberExpectedError(literal.line));
         }
         return literal;
     }
