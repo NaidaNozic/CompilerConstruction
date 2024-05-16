@@ -124,7 +124,7 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                     ret_type = returnStatement.expression.type;
                 }
                 if(!Objects.equals(method_type, ret_type)){
-                    if(!nixEqual(method_type, ret_type) && !baseEqual(method_type, ret_type, method_symbol_table)){
+                    if(!nixEqual(method_type, ret_type) && !baseEqual(method_type, ret_type)){
                         semanticErrors.add(new ReturnTypeError(returnStatement.line));
                     }
 
@@ -135,13 +135,15 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         return block;
     }
 
-    private boolean baseEqual(String methodType, String retType, SymbolTable method_symbol_table) {
-        SymbolTable methodST = method_symbol_table.getParent();
-        SymbolTable retST = method_symbol_table;
-
+    private boolean baseEqual(String methodType, String retType) {
+        SymbolTable methodST = SymbolTableStorage.getSymbolTableFromStorage(methodType);
+        SymbolTable retST = SymbolTableStorage.getSymbolTableFromStorage(retType);
+        System.out.println("methodST : " + methodST.getScopeId());
+        System.out.println("retST : " + retST.getScopeId());
         SymbolTable baseST = null;
         if(methodST != null) {
             SymbolTable baseSymbolTable1 = methodST.getBaseClass();
+
             while (baseSymbolTable1 != null) {
                 if (baseSymbolTable1.getScopeId().equals(retType)) {
                     return true;
