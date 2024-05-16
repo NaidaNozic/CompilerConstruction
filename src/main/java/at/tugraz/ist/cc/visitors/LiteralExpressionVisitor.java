@@ -11,6 +11,7 @@ import java.util.List;
 public class LiteralExpressionVisitor extends JovaBaseVisitor<LiteralExpression> {
 
     public List<SemanticError> semanticErrors;
+    public static String unary = "";
 
     public LiteralExpressionVisitor(List<SemanticError> semanticErrors) {
         this.semanticErrors = semanticErrors;
@@ -20,13 +21,16 @@ public class LiteralExpressionVisitor extends JovaBaseVisitor<LiteralExpression>
     public LiteralExpression visitIntegerLiteral(JovaParser.IntegerLiteralContext ctx) {
         int line = ctx.INT().getSymbol().getLine();
         try{
-            Integer value = Integer.valueOf(ctx.getChild(0).getText());
-            return new IntegerLiteral(line,value);
+            String complete_int = unary + ctx.getChild(0).getText();
+            unary = "";
+            Integer.parseInt(complete_int);
+
+            return new IntegerLiteral(line,ctx.getChild(0).getText());
         }
         catch (NumberFormatException n){
             IntegerSizeError size_err = new IntegerSizeError(line);
             semanticErrors.add(size_err);
-            return new IntegerLiteral(line,0);
+            return new IntegerLiteral(line,"0");
         }
     }
 

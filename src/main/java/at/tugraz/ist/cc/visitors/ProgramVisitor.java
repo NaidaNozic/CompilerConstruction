@@ -27,6 +27,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         this.jovaWarnings = jovaWarnings;
         SymbolTableStorage.reset();
         ExpressionVisitor.reset();
+        LiteralExpressionVisitor.unary = "";
     }
     @Override
     public Program visitProgram(JovaParser.ProgramContext ctx) {

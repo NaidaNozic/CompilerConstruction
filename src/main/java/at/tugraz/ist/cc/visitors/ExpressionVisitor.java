@@ -106,6 +106,8 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         }
         else if (ctx.ADDOP() != null) {
             operator = ctx.ADDOP().getSymbol().getText();
+
+            LiteralExpressionVisitor.unary = operator;
         }
         assert operator != null;
 
