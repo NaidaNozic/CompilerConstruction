@@ -113,6 +113,8 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
         Expression child = visit(ctx.getChild(1));
 
+        LiteralExpressionVisitor.unary = "";
+
         if(this.invalidDotOperatorRightExpr) return new AddNotExpression(operator, child, "invalid");
 
         if (operator.equals("!")) {
