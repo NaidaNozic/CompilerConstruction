@@ -124,12 +124,55 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
                     ret_type = returnStatement.expression.type;
                 }
                 if(!Objects.equals(method_type, ret_type)){
-                    semanticErrors.add(new ReturnTypeError(returnStatement.line));
+                    if(!nixEqual(method_type, ret_type) && !baseEqual(method_type, ret_type, method_symbol_table)){
+                        semanticErrors.add(new ReturnTypeError(returnStatement.line));
+                    }
+
                 }
 
             }
         }
         return block;
+    }
+
+    private boolean baseEqual(String methodType, String retType, SymbolTable method_symbol_table) {
+        SymbolTable methodST = method_symbol_table.getParent();
+        SymbolTable retST = method_symbol_table;
+
+        SymbolTable baseST = null;
+        if(methodST != null) {
+            SymbolTable baseSymbolTable1 = methodST.getBaseClass();
+            while (baseSymbolTable1 != null) {
+                if (baseSymbolTable1.getScopeId().equals(retType)) {
+                    return true;
+                } else {
+                    baseST = baseSymbolTable1;
+                    baseSymbolTable1 = baseSymbolTable1.getBaseClass();
+                }
+            }
+
+        }
+        if(retST != null) {
+            SymbolTable baseSymbolTable2 = retST.getBaseClass();
+            while (baseSymbolTable2 != null) {
+                if (baseSymbolTable2.getScopeId().equals(methodType)) {
+                    return true;
+                } else {
+                    if(baseST != null && baseSymbolTable2.getScopeId().equals(baseST.getScopeId())){
+                        return true;
+                    }
+                    baseSymbolTable2 = baseSymbolTable2.getBaseClass();
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean nixEqual(String methodType, String retType) {
+        if(Objects.equals(methodType, "string") || Objects.equals(methodType, "bool") || Objects.equals(methodType,"int")){
+           return false;
+        }
+        return Objects.equals(retType, "nix");
     }
 
 
