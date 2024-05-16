@@ -145,6 +145,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         }
         return false;
     }
+
     private void checkExpression(IdExpression idExpression, SymbolTable mst) {
         if (idExpression.childCount == 1) { //that's a variable
             Symbol symbol = searchInSymbolTable(idExpression, mst);
@@ -185,7 +186,8 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
 
                     for (int i = 0; i < param_symbols.size(); i++) {
-                        if (!Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i))) {
+                        if (!(Objects.equals(param_symbols.get(i).getType().type, arg_types.get(i)) ||
+                                checkClassTypes(param_symbols.get(i).getType().type, arg_types.get(i)))) {
                             semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
                             idExpression.type = "invalid";
                             return;
@@ -200,6 +202,27 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             semanticErrors.add(new MethodUnknownError(idExpression.Id, arg_types, idExpression.line));
             idExpression.type = "invalid";
         }
+    }
+
+    private boolean checkClassTypes(String paramType, String argType){
+        SymbolTable arg_type_class = SymbolTableStorage.getSymbolTableFromStorage(argType);
+
+        if (Objects.equals(argType, "nix")) {
+            return !(Objects.equals(paramType, "string") || Objects.equals(paramType, "bool") || Objects.equals(paramType, "int"));
+        }
+
+        if (arg_type_class != null) {
+            SymbolTable base_class = arg_type_class.getBaseClass();
+
+            while (base_class != null) {
+                if (Objects.equals(base_class.getScopeId(), paramType)) {
+                    return true;
+                } else {
+                    base_class = base_class.getBaseClass();
+                }
+            }
+        }
+        return false;
     }
 
 

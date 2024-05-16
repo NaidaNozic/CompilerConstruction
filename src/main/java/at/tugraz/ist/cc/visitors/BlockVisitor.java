@@ -113,8 +113,8 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
                 ReturnStatement returnStatement = returnStatementVisitor.visit(ctx.getChild(i));
 
-                if (!(Objects.equals(returnStatement.expression.type, method_type) ||
-                        (checkClassTypes(method_type, returnStatement.expression.type)))) {
+                if (!(Objects.equals(method_type, returnStatement.expression.type) ||
+                        checkClassTypes(method_type, returnStatement.expression.type))) {
                     semanticErrors.add(new ReturnTypeError(returnStatement.line));
                 }
 
