@@ -6,8 +6,6 @@ import at.tugraz.ist.cc.program.*;
 
 import java.util.*;
 
-import static org.antlr.v4.analysis.LeftRecursiveRuleAnalyzer.ASSOC.right;
-
 public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
     public List<SemanticError> semanticErrors;
@@ -85,26 +83,22 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             Symbol symbol = searchInSymbolTableWithDotOperator(rightExpr, mst);
 
             if (checkForPrint(rightExpr)) {
-                ExpressionVisitor.leafCounter--;
                 semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "int";
                 return;
             } else if (checkForReadInt(rightExpr)) {
-                ExpressionVisitor.leafCounter++;
                 semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "int";
                 return;
             } else if (checkForReadLine(rightExpr)) {
-                ExpressionVisitor.leafCounter++;
                 semanticErrors.add(new MemberFunctionUnknownError(type,
                         rightExpr.Id, arg_types, rightExpr.line));
                 rightExpr.type = "string";
                 return;
             }
 
-            ExpressionVisitor.leafCounter++;
 
             for (Expression id : rightExpr.expressions) {
                 if (Objects.equals(id.type, "invalid")) {
@@ -157,7 +151,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
             if (symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD)) {
-                ExpressionVisitor.leafCounter++;
                 idExpression.type = symbol.getType().type;
             } else {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));
@@ -168,20 +161,16 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
             if (checkForPrint(idExpression)) {
-                ExpressionVisitor.leafCounter--;
                 idExpression.type = "int";
                 return;
             } else  if (checkForReadInt(idExpression)) {
-                ExpressionVisitor.leafCounter++;
                 idExpression.type = "int";
                 return;
             } else if (checkForReadLine(idExpression)) {
-                ExpressionVisitor.leafCounter++;
                 idExpression.type = "string";
                 return;
             }
 
-            ExpressionVisitor.leafCounter++;
 
             for (Expression id : idExpression.expressions) {
                 if (Objects.equals(id.type, "invalid")) {
@@ -267,15 +256,6 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         return null;
     }
 
-    private boolean checkForBuiltIn(IdExpression idExpression) {
-        if (Objects.equals(idExpression.Id, "print") && idExpression.expressions.size() == 1) {
-            return Objects.equals(idExpression.expressions.getFirst().type, "int") ||
-                    Objects.equals(idExpression.expressions.getFirst().type, "bool") ||
-                    Objects.equals(idExpression.expressions.getFirst().type, "string");
-        } else {
-            return Objects.equals(idExpression.Id, "readInt") && idExpression.expressions.isEmpty();
-        }
-    }
     private boolean checkForPrint(IdExpression idExpression) {
         return (Objects.equals(idExpression.Id, "print") && idExpression.expressions.size() == 1) &&
                 (Objects.equals(idExpression.expressions.getFirst().type, "int") ||

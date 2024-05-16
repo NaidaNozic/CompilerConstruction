@@ -5,7 +5,6 @@ import at.tugraz.ist.cc.error.semantic.*;
 import at.tugraz.ist.cc.program.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,7 +12,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     public List<SemanticError> semanticErrors;
 
-    public static int leafCounter = 0;
     public static ArrayList<String> allOperators = new ArrayList<>();
     public Expression leftExprOfDotOperator = null;
     public boolean invalidDotOperatorRightExpr = false;
@@ -71,7 +69,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
 
     @Override
     public Expression visitLiteralExpression(JovaParser.LiteralExpressionContext ctx) {
-        leafCounter++;
         LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
@@ -288,7 +285,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
     }
 
     public static void reset() {
-        leafCounter = 0;
         allOperators.clear();
     }
 
