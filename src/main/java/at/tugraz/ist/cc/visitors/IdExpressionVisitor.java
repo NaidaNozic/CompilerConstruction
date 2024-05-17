@@ -26,6 +26,10 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
         String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
         SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
+        SymbolTable mstHelp = null;
+        if(withinMain(method_symbol_table)){
+            mstHelp = separateMain(method_symbol_table);
+        }
 
         IdExpression idExpression = new IdExpression(ctx.getChild(0).getText(), ctx.ID().getSymbol().getLine(), ctx.getChildCount());
 
@@ -42,9 +46,23 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         } else if(invalidDotOperatorRightExpr) {
             idExpression.type = "invalid";
         }else{
-            checkExpression(idExpression, method_symbol_table);
+            checkExpression(idExpression, method_symbol_table, mstHelp);
         }
         return idExpression;
+    }
+
+    private SymbolTable separateMain(SymbolTable methodSymbolTable) {
+        while(!methodSymbolTable.getScopeId().equals("main")){
+            methodSymbolTable = methodSymbolTable.getParent();
+        }
+        SymbolTable outerWrapper = methodSymbolTable.getParent();
+        SymbolTable helpST = new SymbolTable("mainHelp");
+        for (String key: methodSymbolTable.getSymbolTable().keySet()) {
+            if(!outerWrapper.getSymbolTable().containsKey(key)){
+                helpST.addSymbolToTable(key, methodSymbolTable.getSymbolTable().get(key));
+            }
+        }
+        return helpST;
     }
 
     private void checkExpressionWithDotOperator(IdExpression rightExpr, SymbolTable mst){
@@ -160,12 +178,16 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         return false;
     }
 
-    private void checkExpression(IdExpression idExpression, SymbolTable mst) {
+    private void checkExpression(IdExpression idExpression, SymbolTable mst, SymbolTable mstHelp) {
         if (idExpression.childCount == 1) { //that's a variable
             Symbol symbol = searchInSymbolTable(idExpression, mst);
 
             if (symbol != null && (symbol.getSymbolType() != Symbol.SymbolType.METHOD)) {
                 idExpression.type = symbol.getType().type;
+
+                if(withinMain(mst) && !mstHelp.getSymbolTable().containsKey(idExpression.Id)){
+                    semanticErrors.add(new MainError(idExpression.line));
+                }
             } else {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));
                 idExpression.type = "invalid";
@@ -173,6 +195,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         } else { //that's a method
             ArrayList<String> arg_types = new ArrayList<>();
             Symbol symbol = searchInSymbolTable(idExpression, mst);
+
 
             if (checkForPrint(idExpression)) {
                 idExpression.type = "int";
@@ -196,6 +219,9 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             }
 
             if (symbol != null && symbol.getSymbolType() == Symbol.SymbolType.METHOD) {
+                if(withinMain(mst) && !mstHelp.getSymbolTable().containsKey(idExpression.Id)){
+                    semanticErrors.add(new MainError(idExpression.line));
+                }
                 if (symbol.getParamSymbols().size() == arg_types.size()) {
                     ArrayList<Symbol> param_symbols = symbol.getParamSymbols();
 

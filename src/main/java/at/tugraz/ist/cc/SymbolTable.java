@@ -85,6 +85,10 @@ public class SymbolTable {
     public void updateSymbolTable(String self) {
         symbolTable.put(self, new Symbol(self, new ClassType(self), Symbol.SymbolType.CLASS));
     }
+
+    public void addSymbolToTable(String key, Symbol s){
+        symbolTable.put(key, s);
+    }
     //-------------------------------------------------------------------------------------------------------------
 
     public String getScopeId() {
