@@ -65,10 +65,10 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
 
 
 
-
-                if (expression instanceof OperatorExpression &&
-                        !(((OperatorExpression) expression).operator).equals("=") && !validExpression &&
-                        !(((OperatorExpression) expression).operator).equals(".")){
+                if(expression instanceof OperatorExpression && (((OperatorExpression) expression).operator).equals(".")){
+                    if(checkIfFieldOfClass(expression)) semanticErrors.add(new AssignmentExpectedError(expression.line));
+                }else if (expression instanceof OperatorExpression &&
+                        !(((OperatorExpression) expression).operator).equals("=") && !validExpression){
                     semanticErrors.add(new AssignmentExpectedError(expression.line));
                 } else if (expression instanceof IntegerLiteral ||
                         expression instanceof BooleanLiteral ||
@@ -119,6 +119,14 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
             }
         }
         return block;
+    }
+
+    private boolean checkIfFieldOfClass(Expression expression){
+        if((((OperatorExpression) expression).rightExpression) instanceof IdExpression){
+            IdExpression right = (IdExpression) ((OperatorExpression) expression).rightExpression;
+            return right.childCount == 1;
+        }
+        return false;
     }
 
     private boolean checkClassTypes(String methodType, String retType){
