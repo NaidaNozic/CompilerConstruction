@@ -55,6 +55,9 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         String type = leftExprOfDotOperator.type;
         if(type.equals("this")){
             type = mst.getParent().getScopeId();
+            if(withinMain(mst)){
+                semanticErrors.add(new MainError(leftExprOfDotOperator.line));
+            }
         }
         if (leftExprOfDotOperator.type.equals("int") || leftExprOfDotOperator.type.equals("bool") ||
                 leftExprOfDotOperator.type.equals("string") || leftExprOfDotOperator.type.equals("nix")) {
@@ -130,6 +133,16 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
                     rightExpr.Id, arg_types, rightExpr.line));
             rightExpr.type = "invalid";
         }
+    }
+
+    private boolean withinMain(SymbolTable mst) {
+        if(Objects.equals(mst.getScopeId(), "main")) return true;
+        SymbolTable parent = mst.getParent();
+        while(parent != null){
+            if(Objects.equals(parent.getScopeId(), "main")) return true;
+            parent = parent.getParent();
+        }
+        return false;
     }
 
     private boolean getBaseAndSubclassComparison(String base, String subclass){
@@ -230,6 +243,9 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         ArrayList<String> arg_types = new ArrayList<>();
         for (Expression expr : expressions){
             if(expr.type.equals("this")){
+                if(withinMain(mst)){
+                    semanticErrors.add(new MainError(expr.line));
+                }
                 arg_types.add(mst.getParent().getScopeId());
             }else{
                 arg_types.add(expr.type);

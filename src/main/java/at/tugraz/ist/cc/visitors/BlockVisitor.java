@@ -30,11 +30,9 @@ public class BlockVisitor extends JovaBaseVisitor<Block> {
         ExpressionVisitor expressionVisitor = new ExpressionVisitor(semanticErrors);
 
         String method_scope_id = SymbolTableStorage.getCurrentMethodScopeID();
-        System.out.println("Hello! " + method_scope_id);
         SymbolTable method_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(method_scope_id);
         SymbolTable parent = method_symbol_table.getParent();
         String method_type = parent.getSymbolTable().get(method_scope_id).getType().type;
-        System.out.println("Parent: " + parent.getSymbolTable().get(method_scope_id).getType().type);
 
         HashSet<String> double_decl_helper = new HashSet<>();
 
