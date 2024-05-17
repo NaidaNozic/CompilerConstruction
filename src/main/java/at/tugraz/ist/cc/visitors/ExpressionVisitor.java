@@ -73,7 +73,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
         LiteralExpressionVisitor literalExpressionVisitor = new LiteralExpressionVisitor(semanticErrors);
         Expression literal = literalExpressionVisitor.visit(ctx.getChild(0));
         if(this.leftExprOfDotOperator != null) {
-            System.out.println("HMMM");
             this.invalidDotOperatorRightExpr = true;
         }
         return literal;
@@ -274,7 +273,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
                 semanticErrors.add(new OperatorTypeError(operator, left.line));
             }
         }else if (Objects.equals(operator,"==") || Objects.equals(operator,"!=")) {
-            System.out.println("Check this:" + comp_left + " with " + comp_right);
             if (bool_operands || int_operands || string_operands) {
                 return new OperatorExpression(left, operator, right, "bool");
             }
@@ -286,8 +284,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
             }
             semanticErrors.add(new OperatorTypeError(operator, left.line));
         }
-        System.out.println(comp_left + " with " + comp_right);
-
 
         return new OperatorExpression(left, operator, right, "invalid");
     }
@@ -309,7 +305,6 @@ public class ExpressionVisitor extends JovaBaseVisitor<Expression> {
             return true;
         }
 
-        System.out.println("what?");
         SymbolTable leftST = SymbolTableStorage.getSymbolTableFromStorage(left);
         SymbolTable rightST = SymbolTableStorage.getSymbolTableFromStorage(right);
 

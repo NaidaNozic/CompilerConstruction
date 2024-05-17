@@ -139,6 +139,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
         if(Objects.equals(mst.getScopeId(), "main")) return true;
         SymbolTable parent = mst.getParent();
         while(parent != null){
+            if(Character.isUpperCase(parent.getScopeId().charAt(0))) return false;
             if(Objects.equals(parent.getScopeId(), "main")) return true;
             parent = parent.getParent();
         }
