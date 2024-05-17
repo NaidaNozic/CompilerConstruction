@@ -75,6 +75,8 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
             type = mst.getParent().getScopeId();
             if(withinMain(mst)){
                 semanticErrors.add(new MainError(leftExprOfDotOperator.line));
+                rightExpr.type = "invalid";
+                return;
             }
         }
         if (leftExprOfDotOperator.type.equals("int") || leftExprOfDotOperator.type.equals("bool") ||
@@ -187,6 +189,7 @@ public class IdExpressionVisitor extends JovaBaseVisitor<IdExpression> {
 
                 if(withinMain(mst) && !mstHelp.getSymbolTable().containsKey(idExpression.Id)){
                     semanticErrors.add(new MainError(idExpression.line));
+                    idExpression.type = "invalid";
                 }
             } else {
                 semanticErrors.add(new IDUnknownError(idExpression.Id, idExpression.line));
