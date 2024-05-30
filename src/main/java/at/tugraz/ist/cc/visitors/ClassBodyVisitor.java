@@ -27,7 +27,7 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         String class_scope_id = SymbolTableStorage.popScopeID();
         SymbolTable class_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(class_scope_id);
 
-        if (SymbolTableStorage.getMode()) {
+        if (SymbolTableStorage.isCollecting()) {
             for (int i=0; i<ctx.getChildCount(); i++){
                 if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
                     Declaration declaration = declarationVisitor.visit(ctx.getChild(i));

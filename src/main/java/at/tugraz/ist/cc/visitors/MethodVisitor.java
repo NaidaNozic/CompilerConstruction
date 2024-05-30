@@ -27,7 +27,7 @@ public class MethodVisitor extends JovaBaseVisitor<Method> {
         List<String> double_decl_list = new ArrayList<>();
         ParamVisitor paramVisitor = new ParamVisitor(semanticErrors);
 
-        if(SymbolTableStorage.getMode()) {
+        if(SymbolTableStorage.isCollecting()) {
             for(int children = 0; children < ctx.getChildCount(); children++)
             {
                 if(ctx.getChild(children) instanceof JovaParser.Param_listContext){

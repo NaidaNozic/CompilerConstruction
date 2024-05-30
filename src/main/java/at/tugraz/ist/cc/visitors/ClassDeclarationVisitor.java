@@ -25,7 +25,7 @@ public class ClassDeclarationVisitor extends JovaBaseVisitor<ClassDeclaration> {
         String id= ctx.getChild(0).getText();
         int line =ctx.CLASS_ID(0).getSymbol().getLine();
 
-        if(SymbolTableStorage.getMode()) {
+        if(SymbolTableStorage.isCollecting()) {
             SymbolTable classTable = new SymbolTable(id);
 
             SymbolTableStorage.addSymbolTableToStorage(classTable);

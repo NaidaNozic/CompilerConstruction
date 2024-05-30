@@ -32,11 +32,11 @@ public class SymbolTableStorage {
         return symbolTableStack.pop();
     }
 
-    public static void switchMode(){
+    public static void stopCollecting(){
         collectClassBodyContent = !collectClassBodyContent;
     }
 
-    public static boolean getMode(){
+    public static boolean isCollecting(){
         return collectClassBodyContent;
     }
 

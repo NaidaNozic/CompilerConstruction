@@ -46,7 +46,7 @@ public class ProgramVisitor extends JovaBaseVisitor<Program> {
         }
 
         //before that collect all decls and methods for symbol tables, after start with actual
-        SymbolTableStorage.switchMode();
+        SymbolTableStorage.stopCollecting();
         //-------------------------------------------------------------------------------
 
         for (int i = 0; i < ctx.getChildCount(); i++){
