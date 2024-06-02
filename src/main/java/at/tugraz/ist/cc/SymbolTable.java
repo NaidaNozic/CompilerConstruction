@@ -65,7 +65,7 @@ public class SymbolTable {
 
     //---------------- one element to update ----------------------------------------------------------------------
     public void updateSymbolTable(Param param){
-        symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.PARAMETER));
+        symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
     }
 
     public void updateSymbolTable(Declaration declaration){

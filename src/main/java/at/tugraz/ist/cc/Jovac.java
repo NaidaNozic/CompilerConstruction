@@ -1,5 +1,6 @@
 package at.tugraz.ist.cc;
 
+import at.tugraz.ist.cc.codegenvisitors.ProgramVisitorCG;
 import at.tugraz.ist.cc.error.lexandparse.LexicalError;
 import at.tugraz.ist.cc.error.lexandparse.SyntaxError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
@@ -10,6 +11,8 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -144,6 +147,34 @@ public class Jovac {
      */
     public void task3(String file_path, String out_path) {
         // TODO: Implement Task 3.
+
+        CharStream input;
+        try {
+            input = CharStreams.fromFileName(file_path);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        JovaLexer lexer = new JovaLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        JovaParser parser = new JovaParser(tokens);
+
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+
+        lexer.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+        parser.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+
+        ParseTree parseTree = parser.program();
+
+        if (lexical_errors.size() +syntax_errors.size() == 0){
+            new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
+        }
+
+        if (lexical_errors.size() + syntax_errors.size() + semantic_errors.size() == 0){
+            new ProgramVisitorCG(Paths.get(file_path).getFileName().toString()).visit(parseTree);
+        }
+
+        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
     }
 
 
