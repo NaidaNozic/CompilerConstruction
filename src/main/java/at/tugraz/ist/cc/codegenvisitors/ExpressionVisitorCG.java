@@ -2,9 +2,6 @@ package at.tugraz.ist.cc.codegenvisitors;
 
 import at.tugraz.ist.cc.*;
 import at.tugraz.ist.cc.program.*;
-import at.tugraz.ist.cc.visitors.IdExpressionVisitor;
-import at.tugraz.ist.cc.visitors.LiteralExpressionVisitor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 

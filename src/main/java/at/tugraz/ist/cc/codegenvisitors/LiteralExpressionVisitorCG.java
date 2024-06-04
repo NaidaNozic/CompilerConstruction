@@ -2,11 +2,10 @@ package at.tugraz.ist.cc.codegenvisitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.error.semantic.IntegerSizeError;
-import at.tugraz.ist.cc.error.semantic.SemanticError;
+
 import at.tugraz.ist.cc.program.*;
 
-import java.util.List;
+
 
 public class LiteralExpressionVisitorCG extends JovaBaseVisitor<LiteralExpression> {
 

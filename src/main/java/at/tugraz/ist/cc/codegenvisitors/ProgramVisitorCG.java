@@ -11,9 +11,17 @@ public class ProgramVisitorCG extends JovaBaseVisitor<Program> {
 
     public String fileName;
 
+    //every label is unique in the program
+    public static int if_counter;
+    public static int while_counter;
+    public static int relation_counter;
+
 
     public ProgramVisitorCG(String fileName){
         this.fileName = fileName;
+        if_counter = 0;
+        while_counter = 0;
+        relation_counter = 0;
     }
 
     @Override

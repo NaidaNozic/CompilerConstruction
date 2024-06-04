@@ -2,12 +2,9 @@ package at.tugraz.ist.cc.codegenvisitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.Param;
 import at.tugraz.ist.cc.program.Type;
-import at.tugraz.ist.cc.visitors.TypeVisitor;
 
-import java.util.List;
 
 public class ParamVisitorCG extends JovaBaseVisitor<Param> {
 

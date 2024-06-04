@@ -1,13 +1,9 @@
 package at.tugraz.ist.cc.codegenvisitors;
 
 import at.tugraz.ist.cc.*;
-import at.tugraz.ist.cc.error.semantic.*;
 import at.tugraz.ist.cc.program.*;
-import at.tugraz.ist.cc.visitors.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 
 public class BlockVisitorCG extends JovaBaseVisitor<Block> {
@@ -26,26 +22,62 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
 
                 buildJasminExpression(e);
 
-
-
-
             } else if (ctx.getChild(i) instanceof JovaParser.If_stmtContext) {
 
-                IfStatement ifStatement = new IfStatementVisitorCG().visit((ctx.getChild(i)));
+                int current_if_layer = ProgramVisitorCG.if_counter++;
+                ProgramVisitorCG.if_counter++;// every if should have a unique label
 
-                buildJasminRelation(ifStatement);
+                IfStatement ifStatement = new IfStatementVisitorCG(true, true).visit((ctx.getChild(i)));
+                buildJasminExpression(ifStatement.expression);
+
+                JasminFileGenerator.writeContent("ifeq IF_" + current_if_layer); //if if_statement evaluates to false...
+                new IfStatementVisitorCG(false, true).visit((ctx.getChild(i))); //visit then block
+                JasminFileGenerator.writeContent("goto  FI_" + current_if_layer); //skip else
+                JasminFileGenerator.writeContent("IF_" + current_if_layer + ":"); //...jump to this label
+                new IfStatementVisitorCG(false, false).visit((ctx.getChild(i))); //visit else block or leave if_stmt
+                JasminFileGenerator.writeContent("FI_" + current_if_layer + ":"); //skip else
 
             } else if (ctx.getChild(i) instanceof JovaParser.While_stmtContext) {
 
-//                WhileStatement whileStatement = whileStatementVisitor.visit(ctx.getChild(i));
+                int current_layer_while = ProgramVisitorCG.while_counter;
+                ProgramVisitorCG.while_counter++; // every while should have a unique label
+
+                JasminFileGenerator.writeContent("WHILE_" + current_layer_while + ":"); //return to head of while/start of while
+
+                WhileStatement whileStatement = new WhileStatementVisitorCG(true).visit(ctx.getChild(i));
+                buildJasminExpression(whileStatement.expression);
+                JasminFileGenerator.writeContent("ifeq WHILE_END_" + current_layer_while); //if while evaluates to false...
+                new WhileStatementVisitorCG(false).visit(ctx.getChild(i));
+                JasminFileGenerator.writeContent("goto WHILE_" + current_layer_while); //go back to start of while evaluation
+                JasminFileGenerator.writeContent("WHILE_END_" + current_layer_while + ":"); //...jump to this label
+
+
             }
         }
         return null;
     }
 
 
+
     private void buildJasminExpression(Expression e){
-        if (e instanceof IntegerLiteral integerLiteral){
+        if (e instanceof AddNotExpression addNotExpression){
+            buildJasminExpression(addNotExpression.expression);
+
+            int counter = ProgramVisitorCG.relation_counter;
+            ProgramVisitorCG.relation_counter++;
+
+            if (Objects.equals(addNotExpression.operator, "-")){
+                JasminFileGenerator.writeContent("ineg");
+            } else {
+                JasminFileGenerator.writeContent("ifeq switch_to_true_" + counter + "\n" +
+                                                 "iconst_0\n" +
+                                                 "goto escape_" + counter + "\n" +
+                                                 "switch_to_true_" + counter + ":\n" +
+                                                 "iconst_1\n" +
+                                                 "escape_" + counter + ":");
+            }
+        }
+        else if (e instanceof IntegerLiteral integerLiteral){
             JasminFileGenerator.writeContent("ldc " + integerLiteral.integerValue);
         } else if (e instanceof  BooleanLiteral booleanLiteral) {
             if (booleanLiteral.booleanType){
@@ -103,15 +135,6 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
         }
     }
 
-    private void buildJasminRelation(IfStatement ifStatement){
-
-    }
-
-
-
-
-
-
     private static @NotNull StringBuilder getStringBuilder(IdExpression idExpression) {
         StringBuilder method_call = new StringBuilder("invokevirtual " + CodeGenStorage.getClassID() + "/" + CodeGenStorage.getMethodID() + "(");
 
@@ -151,15 +174,12 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
 
         buildJasminExpression(idExpression.expressions.getFirst());
 
-        String print = ("invokevirtual java/io/PrintStream/println(" + ending);
+        String print = ("invokevirtual java/io/PrintStream/print(" + ending);
 
 
         JasminFileGenerator.writeContent(print);
         return true;
     }
-
-
-
 
     private void doOperation(String operator){
         switch (operator){
@@ -175,34 +195,23 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
     }
 
     private void assembleRelation(String operator){
+        int counter = ProgramVisitorCG.relation_counter;
+        ProgramVisitorCG.relation_counter++;
+
+        String common_string = "iconst_0\n" +
+                               "goto eval_false" + counter + "\n" +
+                               "cond_true" + counter + ":\n" +
+                               "iconst_1\n" +
+                               "eval_false" + counter + ":";
+
         switch (operator){
-            case "<" -> JasminFileGenerator.writeContent("if_icmplt cond_true\n" +
-                                                         "iconst_0\n" +
-                                                         "goto eval_false\n" +
-                                                         "cond_true:\n" +
-                                                         "iconst_1\n" +
-                                                         "eval_false:" );
+            case "<" -> JasminFileGenerator.writeContent("if_icmplt cond_true" + counter + "\n" + common_string);
 
-            case ">" -> JasminFileGenerator.writeContent("if_icmpgt cond_true\n" +
-                                                         "iconst_0\n" +
-                                                         "goto eval_false\n" +
-                                                         "cond_true:\n" +
-                                                         "iconst_1\n" +
-                                                         "eval_false:" );
+            case ">" -> JasminFileGenerator.writeContent("if_icmpgt cond_true" + counter + "\n" + common_string);
 
-            case "==" -> JasminFileGenerator.writeContent("if_icmpeq cond_true\n" +
-                                                          "iconst_0\n" +
-                                                          "goto eval_false\n" +
-                                                          "cond_true:\n" +
-                                                          "iconst_1\n" +
-                                                          "eval_false:" );
+            case "==" -> JasminFileGenerator.writeContent("if_icmpeq cond_true" + counter + "\n" + common_string);
 
-            case "!=" -> JasminFileGenerator.writeContent("if_icmpne cond_true\n" +
-                                                          "iconst_0\n" +
-                                                          "goto eval_false\n" +
-                                                          "cond_true:\n" +
-                                                          "iconst_1\n" +
-                                                          "eval_false:" );
+            case "!=" -> JasminFileGenerator.writeContent("if_icmpne cond_true" + counter + "\n" + common_string);
         }
     }
 }

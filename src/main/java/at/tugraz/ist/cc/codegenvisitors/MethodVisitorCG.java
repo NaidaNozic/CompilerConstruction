@@ -2,19 +2,10 @@ package at.tugraz.ist.cc.codegenvisitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
-import at.tugraz.ist.cc.SymbolTable;
-import at.tugraz.ist.cc.SymbolTableStorage;
-import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
-import at.tugraz.ist.cc.error.semantic.SemanticError;
 import at.tugraz.ist.cc.program.Block;
 import at.tugraz.ist.cc.program.Method;
-import at.tugraz.ist.cc.program.Param;
 import at.tugraz.ist.cc.program.ParamList;
-import at.tugraz.ist.cc.visitors.BlockVisitor;
-import at.tugraz.ist.cc.visitors.ParamVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class MethodVisitorCG extends JovaBaseVisitor<Method> {
     private boolean getMethodInfo;
