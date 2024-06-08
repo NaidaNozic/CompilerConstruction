@@ -14,19 +14,16 @@ public class JasminFileGenerator {
         fileContent += (content + "\n");
     }
 
-
-    public static void makeFile() {
+    public static void makeFile(String outPath) {
         try {
-            FileWriter file = new FileWriter(new File("src/output", CodeGenStorage.getClassID() + ".j"), false);
-            file.write(fileContent);
-            file.close();
+            File outputFile = new File(outPath, CodeGenStorage.getClassID() + ".j");
+            FileWriter fileWriter = new FileWriter(outputFile, false);
+            fileWriter.write(fileContent);
+            fileWriter.close();
         } catch (Exception e) {
             System.out.println("File not written");
         }
-
-
     }
-
 
     public static void reset() {
         fileContent = "";

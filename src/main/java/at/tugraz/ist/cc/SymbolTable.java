@@ -70,11 +70,7 @@ public class SymbolTable {
 
     public void updateSymbolTable(Declaration declaration){
         for (Param param : declaration.params) {
-            if (param.type instanceof ClassType) {
-                symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.CLASS));
-            } else {
-                symbolTable.put(param.id, new Symbol(param.id, param.type, Symbol.SymbolType.VARIABLE));
-            }
+            updateSymbolTable(param);
         }
     }
 

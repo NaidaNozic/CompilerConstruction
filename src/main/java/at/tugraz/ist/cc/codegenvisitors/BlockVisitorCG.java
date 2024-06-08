@@ -136,7 +136,7 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
     }
 
     private static @NotNull StringBuilder getStringBuilder(IdExpression idExpression) {
-        StringBuilder method_call = new StringBuilder("invokevirtual " + CodeGenStorage.getClassID() + "/" + CodeGenStorage.getMethodID() + "(");
+        StringBuilder method_call = new StringBuilder("invokevirtual " + CodeGenStorage.getClassID() + "/" + idExpression.Id + "(");
 
         for (Expression e : idExpression.expressions){
             switch (e.type){
@@ -168,6 +168,8 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
                     return false;
                 }
             }
+        } else {
+            return false;
         }
 
         JasminFileGenerator.writeContent("getstatic java/lang/System/out Ljava/io/PrintStream;");

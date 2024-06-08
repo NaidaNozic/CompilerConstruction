@@ -31,7 +31,6 @@ public class ClassBodyVisitorCG extends JovaBaseVisitor<ClassBody> {
 
                 finishJasminMethod(method);
 
-
             }
         }
         return null;

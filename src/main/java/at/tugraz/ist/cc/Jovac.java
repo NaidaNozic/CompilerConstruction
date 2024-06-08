@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
 
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -147,6 +148,11 @@ public class Jovac {
      */
     public void task3(String file_path, String out_path) {
         // TODO: Implement Task 3.
+        try {
+            Files.createDirectories(Paths.get(out_path));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create output directory: " + out_path, e);
+        }
 
         CharStream input;
         try {
@@ -171,7 +177,7 @@ public class Jovac {
         }
 
         if (lexical_errors.size() + syntax_errors.size() + semantic_errors.size() == 0){
-            new ProgramVisitorCG(Paths.get(file_path).getFileName().toString()).visit(parseTree);
+            new ProgramVisitorCG(Paths.get(file_path).getFileName().toString(), out_path).visit(parseTree);
         }
 
         JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
