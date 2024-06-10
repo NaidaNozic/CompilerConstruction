@@ -100,7 +100,8 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
             } else {
                 buildJasminExpression(operatorExpression.leftExpression);
                 buildJasminExpression(operatorExpression.rightExpression);
-                doOperation(operatorExpression.operator);
+                if(operatorExpression.leftExpression.type!=null && operatorExpression.rightExpression.type!=null)
+                    doOperation(operatorExpression.operator);
             }
 
         } else if (e instanceof IdExpression idExpression) {
@@ -148,11 +149,14 @@ public class BlockVisitorCG extends JovaBaseVisitor<Block> {
 
         method_call.append(")");
 
-        switch (idExpression.type){
-            case "int" -> method_call.append("I");
-            case "bool" -> method_call.append("Z");
-            case "string" -> method_call.append("Ljava/lang/String;");
+        if(idExpression.type != null){
+            switch (idExpression.type){
+                case "int" -> method_call.append("I");
+                case "bool" -> method_call.append("Z");
+                case "string" -> method_call.append("Ljava/lang/String;");
+            }
         }
+
         return method_call;
     }
 

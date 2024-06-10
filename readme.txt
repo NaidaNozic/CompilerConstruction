@@ -10,7 +10,6 @@ Group18
 
 Leo Trojnar    (11743053)   leo.trojnar@student.tugraz.at
 Naida Nozic    (12336462)   naida.nozic@student.tugraz.at
-Faruk Hamzic   (12346498)   faruk.hamzic@student.tugraz.at
 Faruk Sahat    (12336460)   faruk.sahat@student.tugraz.at
 
 # The group name can contain letters, digits and spaces
