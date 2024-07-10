@@ -1,0 +1,6 @@
+Class{
+    int a;
+    bool test(){
+        return true;
+    }
+}
