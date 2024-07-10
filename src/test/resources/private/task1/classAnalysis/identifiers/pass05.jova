@@ -1,0 +1,14 @@
+Moon {
+    bool a;
+    bool method(){
+        a = true;
+    }
+    int test(){
+        if (a == new Star){
+            int z;
+        }
+    }
+}
+
+Star{
+}

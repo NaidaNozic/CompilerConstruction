@@ -51,23 +51,35 @@ fragment UPPERCASE : [A-Z] ;
  param : type ID;
  param_list : param (',' param)* ;
  block : '{' (decl | if_stmt | while_stmt | return_stmt | expr ';')* '}' ;
- decl : (param (',' ID)* | expr) ';' ;
+ decl : (param (',' ID)* ) ';' ;
  if_stmt : KEY_IF '(' expr ')' block (KEY_ELSE block)? ;
  while_stmt : KEY_WHILE '(' expr ')' block ;
  return_stmt : KEY_RETURN expr ';' ;
 
- expr : literal
-        | id_expr
-        | KEY_NEW CLASS_ID
-        | '(' expr ')'
-        | expr DOT expr
-        | (ADDOP | NOT) expr
-        | expr MULOP expr
-        | expr ADDOP expr
-        | expr RELOP expr
-        | expr AND expr
-        | expr OR expr
-        | expr ASSIGN expr;
+ expr
+     : literal                #LiteralExpression
+     | id_expr               #IdExpression
+     | KEY_NEW CLASS_ID      #NewClassExpression
+     | '(' expr ')'          #ParanthesisExpression
+     | expr DOT expr         #DotOperator
+     | (ADDOP | NOT) expr    #AddNotExpression
+     | expr MULOP expr       #MultiplicationOperator
+     | expr ADDOP expr       #AddOperator
+     | expr RELOP expr       #RelopOperator
+     | expr AND expr         #AndOperator
+     | expr OR expr          #OrOperator
+     | expr ASSIGN exprRight #AssignOperator
+     ;
+
+exprRight
+    : expr                  #ExpressionRight
+    | (ASSIGN exprRight)    #AssignOperatorRight
+    ;
 
  id_expr : ID ( '(' ( (expr ',')* expr )? ')')? ;
- literal : INT | BOOL | STRING | KEY_NIX | KEY_THIS ;
+ literal : INT      #IntegerLiteral
+         | BOOL     #BooleanLiteral
+         | STRING   #StringLiteral
+         | KEY_NIX  #NixLiteral
+         | KEY_THIS #ThisLiteral
+         ;

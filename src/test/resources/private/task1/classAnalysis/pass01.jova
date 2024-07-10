@@ -1,0 +1,16 @@
+Tobi {
+    int tobi_meth(int a){}
+}
+
+Michi {
+    int michi_meth(int a){}
+}
+
+Ju {
+    int me(int t){}
+
+
+    int ju_meth(int a){
+       hi(nix + 1);
+    }
+}

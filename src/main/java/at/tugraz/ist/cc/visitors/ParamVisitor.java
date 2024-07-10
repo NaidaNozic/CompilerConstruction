@@ -3,10 +3,8 @@ package at.tugraz.ist.cc.visitors;
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.ClassBody;
 import at.tugraz.ist.cc.program.Param;
 import at.tugraz.ist.cc.program.Type;
-import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 

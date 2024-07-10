@@ -1,0 +1,5 @@
+Class {
+    bool meth(int a, bool b) {}
+
+    int meth(int a, bool b) {}
+}

@@ -1,9 +1,10 @@
 package at.tugraz.ist.cc.program;
 
-public class IntegerLiteral extends Literal{
-    public Integer integerType;
-    public IntegerLiteral(Integer line, Integer integerType) {
+public class IntegerLiteral extends LiteralExpression {
+    public String integerValue;
+    public IntegerLiteral(Integer line, String integerValue) {
         super(line);
-        this.integerType = integerType;
+        this.integerValue = integerValue;
+        this.type = "int";
     }
 }

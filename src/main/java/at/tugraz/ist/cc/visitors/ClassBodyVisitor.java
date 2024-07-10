@@ -2,22 +2,18 @@ package at.tugraz.ist.cc.visitors;
 
 import at.tugraz.ist.cc.JovaBaseVisitor;
 import at.tugraz.ist.cc.JovaParser;
+import at.tugraz.ist.cc.SymbolTable;
+import at.tugraz.ist.cc.SymbolTableStorage;
 import at.tugraz.ist.cc.error.semantic.IDDoubleDeclError;
 import at.tugraz.ist.cc.error.semantic.MethodDoubleDefError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
-import at.tugraz.ist.cc.program.ClassBody;
-import at.tugraz.ist.cc.program.Declaration;
-import at.tugraz.ist.cc.program.Method;
-import at.tugraz.ist.cc.program.Param;
-import org.antlr.v4.codegen.model.decl.Decl;
+import at.tugraz.ist.cc.program.*;
 
 import java.util.*;
 
 public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
 
     public List<SemanticError> semanticErrors;
-
-    private Set<String> declarationNames = new HashSet<>();
 
     public ClassBodyVisitor(List<SemanticError> semanticErrors){
         this.semanticErrors = semanticErrors;
@@ -28,20 +24,65 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         DeclarationVisitor declarationVisitor = new DeclarationVisitor(semanticErrors);
         MethodVisitor methodVisitor = new MethodVisitor(semanticErrors);
 
-        for (int i=0; i<ctx.getChildCount(); i++){
-            if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
-                Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
-                checkConflicts(declaration, classBody.declarations);
-                classBody.declarations.add(declaration);
+        String class_scope_id = SymbolTableStorage.popScopeID();
+        SymbolTable class_symbol_table = SymbolTableStorage.getSymbolTableFromStorage(class_scope_id);
 
+        if (SymbolTableStorage.isCollecting()) {
+            for (int i=0; i<ctx.getChildCount(); i++){
+                if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
+                    Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
+                    class_symbol_table.updateSymbolTable(declaration);
+
+                }
+                else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+
+                    //-------------- only to collect all methods for the symbol table -------------
+
+                    Method method = methodVisitor.visit(ctx.getChild(i));
+                    new SymbolTable(method.param.id, class_symbol_table);
+
+                    class_symbol_table.updateSymbolTable(method);
+                    //------------------------------------------------------------------------------
+                }
             }
-            else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
-                Method method = methodVisitor.visit(ctx.getChild(i));
-                checkBuiltInFunctions(method);
-                checkMethodConflicts(method, classBody.methods);
-                classBody.methods.add(method);
+
+            return classBody;
+        }
+        else {
+            for (int i=0; i<ctx.getChildCount(); i++){
+                if (ctx.getChild(i) instanceof JovaParser.DeclContext) {
+                    Declaration declaration = declarationVisitor.visit(ctx.getChild(i));
+                    checkConflicts(declaration, classBody.declarations);
+                    classBody.declarations.add(declaration);
+
+                }
+                else if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+                    if (ctx.getChild(i) instanceof JovaParser.MethodContext) {
+                        SymbolTable methodSymbolTable = class_symbol_table.getChild(ctx.getChild(i).getChild(0).getChild(1).getText());
+
+                        methodSymbolTable.copyClassSymbolTable(class_symbol_table);
+
+                        SymbolTableStorage.addSymbolTableToStorage(methodSymbolTable);
+
+                        SymbolTableStorage.pushScopeID(class_scope_id);
+                        SymbolTableStorage.pushScopeID(methodSymbolTable.getScopeId());
+
+
+                        Method method = methodVisitor.visit(ctx.getChild(i));
+                        checkBuiltInFunctions(method);
+                        checkMethodConflicts(method, classBody.methods);
+                        classBody.methods.add(method);
+
+                        SymbolTableStorage.popScopeID();
+                        SymbolTableStorage.popScopeID();
+                    }
+                }
             }
         }
+
+
+
+
         return classBody;
     }
     private void checkConflicts(Declaration declaration, List<Declaration> declarations) {
@@ -97,7 +138,7 @@ public class ClassBodyVisitor extends JovaBaseVisitor<ClassBody> {
         else if((Objects.equals(method.param.id, "readInt") || Objects.equals(method.param.id, "readLine")) &&
                 method.paramList.params.isEmpty()){
 
-                semanticErrors.add(new MethodDoubleDefError(method.param.id, new ArrayList<>(), method.param.line));
+            semanticErrors.add(new MethodDoubleDefError(method.param.id, new ArrayList<>(), method.param.line));
         }
     }
 

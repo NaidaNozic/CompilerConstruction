@@ -1,5 +1,6 @@
 package at.tugraz.ist.cc.program;
 
+
 public class Method {
     public Block block;
     public ParamList paramList;

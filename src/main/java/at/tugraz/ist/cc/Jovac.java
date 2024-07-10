@@ -1,5 +1,6 @@
 package at.tugraz.ist.cc;
 
+import at.tugraz.ist.cc.codegenvisitors.ProgramVisitorCG;
 import at.tugraz.ist.cc.error.lexandparse.LexicalError;
 import at.tugraz.ist.cc.error.lexandparse.SyntaxError;
 import at.tugraz.ist.cc.error.semantic.SemanticError;
@@ -10,9 +11,11 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+
 
 /**
  * DO NOT CHANGE THE NAME OF THIS CLASS OR MOVE IT TO ANOTHER PACKAGE! You can
@@ -42,7 +45,6 @@ public class Jovac {
      *        A string representing the path to the input .jova file.
      */
     public void task1(String file_path) {
-        // TODO: Implement Task 1.
         CharStream input;
         try {
             input = CharStreams.fromFileName(file_path);
@@ -61,12 +63,11 @@ public class Jovac {
 
         ParseTree parseTree = parser.program();
 
-
         if (lexical_errors.size() +syntax_errors.size() == 0){
             new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
         }
 
-        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, semantic_errors, warnings);
+        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
 
     }
 
@@ -105,7 +106,29 @@ public class Jovac {
      *        A string representing the path to the input .jova file.
      */
     public void task2(String file_path) {
-        // TODO: Implement Task 2.
+        CharStream input;
+        try {
+            input = CharStreams.fromFileName(file_path);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        JovaLexer lexer = new JovaLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        JovaParser parser = new JovaParser(tokens);
+
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+
+        lexer.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+        parser.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+
+        ParseTree parseTree = parser.program();
+
+        if (lexical_errors.size() +syntax_errors.size() == 0){
+            new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
+        }
+
+        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
     }
 
 
@@ -125,6 +148,39 @@ public class Jovac {
      */
     public void task3(String file_path, String out_path) {
         // TODO: Implement Task 3.
+        try {
+            Files.createDirectories(Paths.get(out_path));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create output directory: " + out_path, e);
+        }
+
+        CharStream input;
+        try {
+            input = CharStreams.fromFileName(file_path);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        JovaLexer lexer = new JovaLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        JovaParser parser = new JovaParser(tokens);
+
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+
+        lexer.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+        parser.addErrorListener(new JovaErrorListener(lexical_errors, syntax_errors));
+
+        ParseTree parseTree = parser.program();
+
+        if (lexical_errors.size() +syntax_errors.size() == 0){
+            new ProgramVisitor(semantic_errors, warnings).visit(parseTree);
+        }
+
+        if (lexical_errors.size() + syntax_errors.size() + semantic_errors.size() == 0){
+            new ProgramVisitorCG(Paths.get(file_path).getFileName().toString(), out_path).visit(parseTree);
+        }
+
+        JovaErrorPrinter.printErrorsAndWarnings(lexical_errors, syntax_errors, getSemanticErrors(), warnings);
     }
 
 
@@ -160,6 +216,12 @@ public class Jovac {
      * <p>TODO: Implement for Task 1.2.</p>
      */
     public Collection<SemanticError> getSemanticErrors() {
+
+        Comparator<SemanticError> compareByLine = Comparator.comparing( SemanticError::getLine );
+        Comparator<SemanticError> compareByCharPos = Comparator.comparing( SemanticError::getCharPos );
+        Comparator<SemanticError> compareByLineAndCharPos = compareByLine.thenComparing(compareByCharPos);
+        Collections.sort(semantic_errors, compareByLineAndCharPos);
+
         return semantic_errors;
     }
 

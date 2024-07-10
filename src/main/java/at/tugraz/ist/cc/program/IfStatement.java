@@ -6,15 +6,13 @@ public class IfStatement {
     public Block thenBlock;
     public Block elseBlock;
 
-    public IfStatement(Expression expression, Block thenBlock){
-        this.expression = expression;
-        this.thenBlock = thenBlock;
-    }
+    public int line;
 
-    public IfStatement(Expression expression, Block thenBlock, Block elseBlock){
+    public IfStatement(Expression expression, Block thenBlock, Block elseBlock, int line){
         this.expression = expression;
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
+        this.line = line;
     }
 
 }
